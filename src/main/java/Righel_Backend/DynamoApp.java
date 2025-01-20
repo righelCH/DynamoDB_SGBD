@@ -59,10 +59,10 @@ public class DynamoApp {
 	}
 
 	// Método para seleccionar el perfil y conectarse a DynamoDB
-	public void selectProfileAndConnect() {
+	public void selectProfileAndConnect(String profileName) {
 		// Usar ProfileCredentialsProvider para obtener las credenciales del perfil
 		// seleccionado
-		String profileName = JOptionPane.showInputDialog("Introduce el nombre del perfil de AWS:");
+
 		if (profileName != null && !profileName.trim().isEmpty()) {
 			ProfileCredentialsProvider profileCredentialsProvider = new ProfileCredentialsProvider(profileName);
 			try {

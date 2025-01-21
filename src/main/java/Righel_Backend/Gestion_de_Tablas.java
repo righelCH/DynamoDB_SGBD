@@ -13,6 +13,7 @@ public class Gestion_de_Tablas {
 
 	private AmazonDynamoDB dynamoDB;
 	private DynamoDB dynamoDBClient;
+	String tablechoose = null;
 
 	public Gestion_de_Tablas(AmazonDynamoDB dynamoDB) {
 		this.dynamoDB = dynamoDB;
@@ -20,13 +21,14 @@ public class Gestion_de_Tablas {
 	}
 
 	// Método para listar las tablas
-	public void listarTablas() {
+	public StringBuilder listarTablas() {
+		StringBuilder tableList = null;
 		try {
 			ListTablesRequest listTablesRequest = new ListTablesRequest();
 			ListTablesResult listTablesResponse = dynamoDB.listTables(listTablesRequest);
 			List<String> tables = listTablesResponse.getTableNames();
 
-			StringBuilder tableList = new StringBuilder("Tablas disponibles:\n");
+			tableList = new StringBuilder("Tablas disponibles:\n");
 			for (String tableName : tables) {
 				tableList.append(tableName).append("\n");
 			}
@@ -34,6 +36,17 @@ public class Gestion_de_Tablas {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Error al listar las tablas: " + e.getMessage());
 		}
+
+		return tableList;
+	}
+
+	public String seleccionarTabla(JList<String> listaTabla) {
+
+		listaTabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listaTabla.addListSelectionListener(e -> {
+			tablechoose = (String) listaTabla.getSelectedValue();
+		});
+		return tablechoose;
 	}
 
 	// Método para crear una tabla con parámetros proporcionados

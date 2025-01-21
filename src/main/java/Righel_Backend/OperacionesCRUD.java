@@ -1,4 +1,5 @@
 package Righel_Backend;
+
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
@@ -11,13 +12,15 @@ import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 public class OperacionesCRUD {
 
 	private final DynamoDB dynamoDB;
+	private String tableName;
 
-	public OperacionesCRUD(DynamoDB dynamoDB) {
+	public OperacionesCRUD(DynamoDB dynamoDB, String tableName) {
 		this.dynamoDB = dynamoDB;
+		this.tableName = tableName;
 	}
 
 	// Crear un ítem
-	public void createItem(String tableName, String key, String keyValue, String attribute, String attributeValue) {
+	public void createItem(String key, String keyValue, String attribute, String attributeValue) {
 		Table table = dynamoDB.getTable(tableName);
 
 		try {
@@ -31,7 +34,7 @@ public class OperacionesCRUD {
 	}
 
 	// Leer un ítem
-	public void readItem(String tableName, String key, String keyValue) {
+	public void readItem(String key, String keyValue) {
 		Table table = dynamoDB.getTable(tableName);
 
 		try {
@@ -47,8 +50,7 @@ public class OperacionesCRUD {
 		}
 	}
 
-	public void updateItem(String tableName, String primaryKey, String primaryKeyValue, String attributeName,
-			String newValue) {
+	public void updateItem(String primaryKey, String primaryKeyValue, String attributeName, String newValue) {
 		try {
 			Table table = dynamoDB.getTable(tableName);
 
@@ -68,7 +70,7 @@ public class OperacionesCRUD {
 	}
 
 	// Eliminar un ítem
-	public void deleteItem(String tableName, String key, String keyValue) {
+	public void deleteItem(String key, String keyValue) {
 		Table table = dynamoDB.getTable(tableName);
 
 		try {

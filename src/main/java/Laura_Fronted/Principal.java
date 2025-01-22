@@ -5,6 +5,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+
+import Righel_Backend.DynamoApp;
+
 import java.awt.Toolkit;
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -19,6 +22,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class Principal extends JFrame {
 
@@ -33,7 +38,13 @@ public class Principal extends JFrame {
 	private JComboBox<String> comboRegion;
 	private JButton btnEntrar;
 	private JLabel limagen;
-	private JLabel lresul;
+	public JLabel lresul;
+	
+	
+	
+	public JLabel getLresul() {
+		return lresul;
+	}
 
 	/**
 	 * Launch the application.
@@ -55,6 +66,13 @@ public class Principal extends JFrame {
 	 * Create the frame.
 	 */
 	public Principal() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				lresul.setText("Bienvenido a la aplicación DynamoDB, por favor ingrese sus credenciales");
+			}
+		});
+		System.setProperty("aws.java.v1.disableDeprecationAnnouncement", "true");
 		setTitle("DynamoDB");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Principal.class.getResource("/multimedia/Icono_dynamo.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -82,8 +100,8 @@ public class Principal extends JFrame {
 		contentPane.add(limagen);
 
 		tfusuario = new JTextField();
-		tfusuario.setFont(new Font("Georgia", Font.PLAIN, 18));
-		tfusuario.setBounds(655, 206, 223, 30);
+		tfusuario.setFont(new Font("Georgia", Font.PLAIN, 16));
+		tfusuario.setBounds(655, 206, 335, 30);
 		contentPane.add(tfusuario);
 		tfusuario.setColumns(10);
 
@@ -98,8 +116,8 @@ public class Principal extends JFrame {
 		contentPane.add(lcontrasena);
 
 		passwordField = new JPasswordField();
-		passwordField.setFont(new Font("Georgia", Font.PLAIN, 18));
-		passwordField.setBounds(655, 292, 219, 30);
+		passwordField.setFont(new Font("Georgia", Font.PLAIN, 16));
+		passwordField.setBounds(655, 292, 335, 30);
 		contentPane.add(passwordField);
 
 		lregion = new JLabel("Región ");
@@ -109,44 +127,43 @@ public class Principal extends JFrame {
 
 		comboRegion = new JComboBox<String>();
 		comboRegion.setFont(new Font("Georgia", Font.PLAIN, 18));
-		comboRegion.setModel(new DefaultComboBoxModel<String>(
-				new String[] { "Seleccione", "us-east-1", "eu-central-1", "eu-west-3" }));
+		comboRegion.setModel(
+				new DefaultComboBoxModel<String>(new String[] {"Seleccione", "eu-central-1", "eu-west-1", "eu-west-2", "eu-west-3", "eu-north-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2", "ap-northeast-3", "ap-northeast-2", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-south-1", "eu-central-1"}));
 		comboRegion.setBounds(655, 383, 219, 30);
 		contentPane.add(comboRegion);
 
 		btnEntrar = new JButton("Entrar");
 		btnEntrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				if (tfusuario.getText().isBlank() 
-				        && passwordField.getPassword().length == 0 
-				        && comboRegion.getSelectedIndex() == 0) {
-				    lresul.setText("Por favor ingrese todos los campos");
-				    
-				    tfusuario.setBorder(new LineBorder(new Color(255, 0, 0)));
-				    passwordField.setBorder(new LineBorder(new Color(255, 0, 0)));
-				    comboRegion.setBorder(new LineBorder(new Color(255, 0, 0)));
+
+				if (tfusuario.getText().isBlank() && passwordField.getPassword().length == 0
+						&& comboRegion.getSelectedIndex() == 0) {
+					lresul.setText("Por favor ingrese todos los campos");
+
+					tfusuario.setBorder(new LineBorder(new Color(255, 0, 0)));
+					passwordField.setBorder(new LineBorder(new Color(255, 0, 0)));
+					comboRegion.setBorder(new LineBorder(new Color(255, 0, 0)));
 				} else if (tfusuario.getText().isBlank()) {
-				    lresul.setText("Por favor ingrese el usuario");
-				    tfusuario.setBorder(new LineBorder(new Color(255, 0, 0)));
-				    passwordField.setBorder(null);
-				    comboRegion.setBorder(null);
+					lresul.setText("Por favor ingrese el usuario");
+					tfusuario.setBorder(new LineBorder(new Color(255, 0, 0)));
+					passwordField.setBorder(null);
+					comboRegion.setBorder(null);
 				} else if (passwordField.getPassword().length == 0) {
-				    lresul.setText("Por favor ingrese la contraseña");
-				    passwordField.setBorder(new LineBorder(new Color(255, 0, 0)));
-				    tfusuario.setBorder(null);
-				    comboRegion.setBorder(null);
+					lresul.setText("Por favor ingrese la contraseña");
+					passwordField.setBorder(new LineBorder(new Color(255, 0, 0)));
+					tfusuario.setBorder(null);
+					comboRegion.setBorder(null);
 				} else if (comboRegion.getSelectedIndex() == 0) {
-				    lresul.setText("Por favor seleccione una región");
-				    comboRegion.setBorder(new LineBorder(new Color(255, 0, 0)));
-				    tfusuario.setBorder(null);
-				    passwordField.setBorder(null);
+					lresul.setText("Por favor seleccione una región");
+					comboRegion.setBorder(new LineBorder(new Color(255, 0, 0)));
+					tfusuario.setBorder(null);
+					passwordField.setBorder(null);
 				} else {
-				    tfusuario.setBorder(null);
-				    passwordField.setBorder(null);
-				    comboRegion.setBorder(null);
-				    new GUI().setVisible(true);
-				    dispose();
+					tfusuario.setBorder(null);
+					passwordField.setBorder(null);
+					comboRegion.setBorder(null);
+					DynamoApp cliente = new DynamoApp();
+					cliente.connectToDynamoDB(tfusuario.getText(), String.valueOf(passwordField.getPassword()), comboRegion.getSelectedItem().toString(), Principal.this);
 				}
 			}
 		});
@@ -157,8 +174,8 @@ public class Principal extends JFrame {
 
 		lresul = new JLabel("");
 		lresul.setHorizontalAlignment(SwingConstants.CENTER);
-		lresul.setForeground(new Color(255, 0, 0));
-		lresul.setFont(new Font("Georgia", Font.BOLD, 28));
+		lresul.setForeground(new Color(0, 0, 255));
+		lresul.setFont(new Font("Georgia", Font.BOLD, 20));
 		lresul.setBounds(185, 568, 825, 72);
 		contentPane.add(lresul);
 

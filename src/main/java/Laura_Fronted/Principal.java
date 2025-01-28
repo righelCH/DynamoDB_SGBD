@@ -181,7 +181,9 @@ public class Principal extends JFrame {
 					passwordField.setBorder(null);
 					comboRegion.setBorder(null);
 					DynamoApp cliente = new DynamoApp();
-					cliente.connectToDynamoDB(tfusuario.getText(), String.valueOf(passwordField.getPassword()), comboRegion.getSelectedItem().toString(), Principal.this);
+					//cliente.connectToDynamoDB(tfusuario.getText(), String.valueOf(passwordField.getPassword()), comboRegion.getSelectedItem().toString(), Principal.this);
+
+					cliente.connectToDynamoDB(" AKIA3C6FL6TAJVER4NWP", "Ao0igG5BTy4JjYBk7uwtipaInf1KsPBdkGs/2uu5", comboRegion.getSelectedItem().toString(), Principal.this);
 				}
 			}
 		});

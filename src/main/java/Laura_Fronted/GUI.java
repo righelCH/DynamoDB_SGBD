@@ -26,12 +26,18 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
+import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
+import com.amazonaws.services.dynamodbv2.model.QueryRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryResult;
 
 import Righel_Backend.DynamoApp;
 import Righel_Backend.Gestion_de_Tablas;
@@ -48,16 +54,20 @@ import javax.swing.JTable;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.JTextArea;
 
 public class GUI extends JFrame {
 	private static DynamoApp dynamoApp;
@@ -118,6 +128,10 @@ public class GUI extends JFrame {
 
 	private DefaultTableModel dtm;
 	private JButton btnActualizarTabla;
+	private JTextField tnombreTabla;
+	private JTextField tfiltroregex;
+	private JButton baplicarfiltro;
+	private JTextArea textArea;
 
 	/**
 	 * Launch the application.
@@ -815,7 +829,9 @@ public class GUI extends JFrame {
 					if (client == null) {
 						throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
 					}
-
+/*
+ *AmazonDynamoDB client = dynamoApp.getDynamoDB(); 
+ *DynamoDB dynamoDB = new DynamoDB(client);*/
 					// Crear instancia de DynamoDB y seleccionar la tabla
 					DynamoDB dynamoDB = new DynamoDB(client);
 					Table table = dynamoDB.getTable(selectedTable);
@@ -947,8 +963,41 @@ public class GUI extends JFrame {
 		panelConsultas.setBackground(new Color(217, 236, 255));
 		tabbedPane.addTab("Consultas", null, panelConsultas, null);
 		panelConsultas.setLayout(null);
+		
+		tnombreTabla = new JTextField();
+		tnombreTabla.setBounds(244, 38, 86, 20);
+		panelConsultas.add(tnombreTabla);
+		tnombreTabla.setColumns(10);
+		
+		tfiltroregex = new JTextField();
+		tfiltroregex.setBounds(435, 41, 86, 20);
+		panelConsultas.add(tfiltroregex);
+		tfiltroregex.setColumns(10);
+		
+		baplicarfiltro = new JButton("Aplicar filtro");
+		baplicarfiltro.setBounds(293, 101, 89, 23);
+		panelConsultas.add(baplicarfiltro);
+		
+		JLabel lblNewLabel_1 = new JLabel("Nombre de tabla");
+		lblNewLabel_1.setBounds(137, 41, 97, 14);
+		panelConsultas.add(lblNewLabel_1);
+		
+		JLabel lblNewLabel_3 = new JLabel("Filtro");
+		lblNewLabel_3.setBounds(379, 41, 46, 14);
+		panelConsultas.add(lblNewLabel_3);
+		
+		JScrollPane scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBounds(148, 135, 444, 260);
+		panelConsultas.add(scrollPane_2);
+		
+		textArea = new JTextArea();
+		scrollPane_2.setViewportView(textArea);
+		baplicarfiltro.addActionListener(e->{
+			consultarElementosConFiltro();
+		});
 	}
 
+	
 	private Object processAttributeValue(String type, String value) {
 		switch (type) {
 		case "String (S)":
@@ -962,7 +1011,58 @@ public class GUI extends JFrame {
 		}
 	}
 
-	public Gestion_de_Tablas getGestionTablas() {
+	public void consultarElementosConFiltro() {
+    String tableName = "TEST2";  // Nombre de la tabla
+    String partitionKeyName = "clave_participacion";  // Nombre de la clave de partición
+    String partitionKeyValue = "101";  // Valor de la clave de partición
+    String filterKeyName = "campo1";  // Campo a filtrar
+    String filterValue = "7";  // Valor del filtro
+    AmazonDynamoDB client = dynamoApp.getDynamoDB(); 
+    DynamoDB dynamoDB = new DynamoDB(client);
+
+    // Establecer el filtro con la expresión
+    String keyConditionExpression = partitionKeyName + " = :partitionKeyValue";
+    String filterExpression = filterKeyName + " = :filterValue";
+    
+    Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
+    expressionAttributeValues.put(":partitionKeyValue", new AttributeValue().withS(partitionKeyValue));  // Usar .withS() para String
+    expressionAttributeValues.put(":filterValue", new AttributeValue().withN(filterValue));  // Usar .withN() para número
+
+    try {
+        // Crear la solicitud de consulta con la expresión de condición y filtro
+        QueryRequest queryRequest = new QueryRequest()
+            .withTableName(tableName)
+            .withKeyConditionExpression(keyConditionExpression)
+            .withFilterExpression(filterExpression)
+            .withExpressionAttributeValues(expressionAttributeValues);
+
+        // Ejecutar la consulta
+        QueryResult result = client.query(queryRequest);
+
+        // Verificar si hay elementos en la respuesta
+        if (result.getItems().isEmpty()) {
+            textArea.append("No se encontraron resultados.\n");
+        } else {
+            // Procesar los resultados
+            for (Map<String, AttributeValue> item : result.getItems()) {
+                // Mostrar el resultado en el TextArea
+                StringBuilder sb = new StringBuilder();
+                for (Map.Entry<String, AttributeValue> entry : item.entrySet()) {
+                    sb.append(entry.getKey())
+                      .append(": ")
+                      .append(entry.getValue().getS())  // Asumiendo que es un valor String, cambia si es diferente
+                      .append("\n");
+                }
+                textArea.append(sb.toString() + "\n");
+                System.out.println("Resultado: " + sb.toString());
+            }
+        }
+    } catch (AmazonDynamoDBException e) {
+        System.err.println("Error de consulta: " + e.getMessage());
+    }
+}
+
+public Gestion_de_Tablas getGestionTablas() {
 		return gestionTablas;
 	}
 
@@ -1031,6 +1131,4 @@ public class GUI extends JFrame {
 	        ex.printStackTrace();
 	    }
 	}
-
-
 }

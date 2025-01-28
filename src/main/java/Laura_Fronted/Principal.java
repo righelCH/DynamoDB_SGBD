@@ -9,6 +9,8 @@ import javax.swing.border.LineBorder;
 import Righel_Backend.DynamoApp;
 
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.Color;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -24,6 +26,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Principal extends JFrame {
 
@@ -100,6 +104,20 @@ public class Principal extends JFrame {
 		contentPane.add(limagen);
 
 		tfusuario = new JTextField();
+		tfusuario.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				 tfusuario.selectAll();
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				 // Copiar texto seleccionado al portapapeles
+                String selectedText = tfusuario.getSelectedText();
+                if (selectedText != null) {
+                    copyToClipboard(selectedText);
+                }
+			}
+		});
 		tfusuario.setFont(new Font("Georgia", Font.PLAIN, 16));
 		tfusuario.setBounds(655, 206, 335, 30);
 		contentPane.add(tfusuario);
@@ -180,4 +198,10 @@ public class Principal extends JFrame {
 		contentPane.add(lresul);
 
 	}
+	// Método para copiar el texto al portapapeles  
+    private static void copyToClipboard(String text) { 
+        StringSelection selection = new StringSelection(text); 
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard(); 
+        clipboard.setContents(selection, null); 
+    } 
 }

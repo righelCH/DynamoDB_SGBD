@@ -64,7 +64,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JSpinner;
@@ -142,7 +141,7 @@ public class GUI extends JFrame {
 	private JTextField tnombreclaveparticion;
 	private JLabel lblNewLabel_3_4;
 	private JTextField tnombreitem;
-
+private AmazonDynamoDB userAltoNivel ;
 	/**
 	 * Launch the application.
 	 */
@@ -172,7 +171,8 @@ public class GUI extends JFrame {
 	 * @param dynamoApp
 	 * @param dynamoApp
 	 */
-	public GUI(DynamoApp dynamoApp) {
+	public GUI(DynamoApp user) {
+		userAltoNivel= dynamoApp.getDynamoDB();
 		String[] columnas = {};
 		dtm = new DefaultTableModel(columnas, 0) {
 			private static final long serialVersionUID = 1L;
@@ -202,9 +202,8 @@ public class GUI extends JFrame {
 				super.fireTableStructureChanged();
 			}
 		};
-		GUI.dynamoApp = dynamoApp; // Reutilizar la conexión existente
-		AmazonDynamoDB client = dynamoApp.getDynamoDB();
-		setGestionTablas(new Gestion_de_Tablas(client)); // Inicializar Gestion_de_Tablas
+		
+		setGestionTablas(new Gestion_de_Tablas(userAltoNivel)); // Inicializar Gestion_de_Tablas
 
 		setTitle("DynamoDB");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(GUI.class.getResource("/multimedia/Icono_dynamo.png")));
@@ -271,13 +270,13 @@ public class GUI extends JFrame {
 		btnCrearTabla.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					AmazonDynamoDB dynamoDB = dynamoApp.getDynamoDB();
-					if (dynamoDB == null) {
+					
+					if (userAltoNivel == null) {
 						throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
 					}
 
-					Gestion_de_Tablas tabla = new Gestion_de_Tablas(dynamoDB);
-					ListTablesResult result = dynamoDB.listTables();
+					Gestion_de_Tablas tabla = new Gestion_de_Tablas(userAltoNivel);
+					ListTablesResult result = userAltoNivel.listTables();
 					System.out.println("Realizada la conexión, tablas existentes: " + result);
 					// Determinar el tipo de partición
 					String tipoparticion = "";
@@ -509,14 +508,14 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				try {
-					// Obtener el cliente DynamoDB desde DynamoApp
-					AmazonDynamoDB dynamoDB = dynamoApp.getDynamoDB();
-					if (dynamoDB == null) {
+					
+					if (userAltoNivel == null) {
 						throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
 					}
 
+					
 					// Instancia Gestion_de_Tablas con el cliente válido
-					Gestion_de_Tablas gestionTablas = new Gestion_de_Tablas(dynamoDB);
+					Gestion_de_Tablas gestionTablas = new Gestion_de_Tablas(userAltoNivel);
 
 					// Llama al método listarTablas
 					List<String> tablas = gestionTablas.listarTablas();

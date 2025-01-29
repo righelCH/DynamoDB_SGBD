@@ -53,6 +53,10 @@ public class Gestion_de_Tablas {
 //		return tableList;
 //	}
 
+	
+	public List<String> mostrarTablas(){
+		return  this.listarTablas();
+	}
 	// Método para listar tablas y devolverlas como una lista
 	public List<String> listarTablas() {
 	    try {
@@ -83,41 +87,6 @@ public class Gestion_de_Tablas {
 		return tablechoose;
 	}
 
-//	// Método para crear una tabla con parámetros proporcionados
-//	public void crearTabla(String tableName, String partitionKeyName, String partitionKeyType, String sortKeyName,
-//			String sortKeyType, boolean provisioned, Long readCapacityUnits, Long writeCapacityUnits) {
-//		try {
-//			// Definir las claves de la tabla
-//			KeySchemaElement partitionKey = new KeySchemaElement(partitionKeyName, KeyType.HASH);
-//			KeySchemaElement sortKey = null;
-//			if (sortKeyName != null && !sortKeyName.isEmpty()) {
-//				sortKey = new KeySchemaElement(sortKeyName, KeyType.RANGE);
-//			}
-//
-//			// Definir las características de la capacidad (si la tabla es provisionada)
-//			ProvisionedThroughput provisionedThroughput = null;
-//			if (provisioned) {
-//				provisionedThroughput = new ProvisionedThroughput().withReadCapacityUnits(readCapacityUnits)
-//						.withWriteCapacityUnits(writeCapacityUnits);
-//			}
-//
-//			// Crear el objeto CreateTableRequest
-//			CreateTableRequest createTableRequest = new CreateTableRequest().withTableName(tableName)
-//					.withKeySchema(partitionKey, sortKey)
-//					.withAttributeDefinitions(new AttributeDefinition(partitionKeyName, ScalarAttributeType.S),
-//							new AttributeDefinition(sortKeyName, ScalarAttributeType.S))
-//					.withProvisionedThroughput(provisionedThroughput);
-//
-//			// Crear la tabla
-//			Table table = dynamoDBClient.createTable(createTableRequest);
-//			table.waitForActive();
-//			JOptionPane.showMessageDialog(null, "Tabla " + tableName + " creada con éxito.");
-//			
-//		} catch (Exception e) {
-//			JOptionPane.showMessageDialog(null, "Error al crear la tabla: " + e.getMessage());
-//		}
-//	}
-	
 	// Método para crear una tabla con parámetros proporcionados
 	public void crearTabla(String tableName, String partitionKeyName, String partitionKeyType, 
 	                       String sortKeyName, String sortKeyType, boolean provisioned, 

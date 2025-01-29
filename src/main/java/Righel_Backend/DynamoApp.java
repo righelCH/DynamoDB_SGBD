@@ -15,6 +15,27 @@ import javax.swing.*;
 
 public class DynamoApp {
 
+	private AmazonDynamoDB userAltoNivel;
+	private String accessKeyId;
+	private String secretKey;
+	private String region;
+	private Principal frameGUI;
+private OperacionesCRUD operacion;
+private Gestion_de_Tablas gestorTabla;
+
+	public DynamoApp(String accessKeyId,String secretKey,String region,Principal frameGUI) {
+		this.accessKeyId=accessKeyId;
+		this.secretKey=secretKey;
+		this.region=region;
+		this.frameGUI=frameGUI;
+		connectToDynamoDB(accessKeyId, secretKey, region, frameGUI);
+	gestorTabla=new Gestion_de_Tablas(userAltoNivel);
+	
+	DynamoApp aa=new DynamoApp(accessKeyId, secretKey, region, frameGUI);
+	aa.gestorTabla.crearTabla(region, region, accessKeyId, secretKey, region, false, null, null);
+		//operacion=new OperacionesCRUD(dynamoDB, "")
+	}
+
 	private static DynamoApp instance;
 
 	public String getAccessKeyId() {
@@ -41,36 +62,13 @@ public class DynamoApp {
 		this.region = region;
 	}
 
-	private AmazonDynamoDB dynamoDB;
-	private String accessKeyId;
-	private String secretKey;
-	private String region;
-
-	public DynamoApp() {
-
-	}
-
 	// Método para obtener la instancia única
 	public static DynamoApp getInstance() {
 		if (instance == null) {
-			instance = new DynamoApp();
+	//		instance = new DynamoApp();
 		}
 		return instance;
 	}
-
-//	// Método para conectar usando las credenciales extraídas del archivo de
-//	
-//	public void connectToDynamoDB(String accessKeyId,String secretkey,String region) {
-//		if (accessKeyId != null && secretkey != null && region != null) {
-//			BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKeyId, secretkey);
-//			dynamoDB = AmazonDynamoDBClientBuilder.standard()
-//					.withCredentials(new AWSStaticCredentialsProvider(awsCreds)).withRegion(Regions.fromName(region))
-//					.build();
-//			JOptionPane.showMessageDialog(null, "Conectado a DynamoDB con las credenciales del archivo properties.");
-//		} else {
-//			JOptionPane.showMessageDialog(null, "Faltan credenciales para conectar.");
-//		}
-//	}
 
 	@SuppressWarnings("deprecation")
 	public void connectToDynamoDB(String accessKeyId, String secretKey, String region, Principal principalFrame) {
@@ -91,7 +89,7 @@ public class DynamoApp {
 				JOptionPane.showMessageDialog(null, "Conexión exitosa.");
 				System.out.println("Conexión exitosa. Tablas disponibles: " + result.getTableNames());
 
-				// Abre la nueva ventana (GUI)
+				// Abre la nueva ventana (GUI)s
 				GUI gui = new GUI(this); // Pasa esta instancia
 				gui.setVisible(true);
 				principalFrame.dispose();

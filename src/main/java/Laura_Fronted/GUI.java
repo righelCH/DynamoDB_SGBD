@@ -38,6 +38,8 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.services.dynamodbv2.model.QueryResult;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
+import com.amazonaws.services.dynamodbv2.model.ScanResult;
 
 import Righel_Backend.DynamoApp;
 import Righel_Backend.Gestion_de_Tablas;
@@ -129,9 +131,17 @@ public class GUI extends JFrame {
 	private DefaultTableModel dtm;
 	private JButton btnActualizarTabla;
 	private JTextField tnombreTabla;
-	private JTextField tfiltroregex;
+	private JComboBox cbtipoclave;
 	private JButton baplicarfiltro;
 	private JTextArea textArea;
+	private JTextField tvalorclave;
+	private JTextField tvaloritem;
+	private JTextField tfilterregex;
+	private JComboBox cbtipoitem;
+	private JLabel lblNewLabel_3_3;
+	private JTextField tnombreclaveparticion;
+	private JLabel lblNewLabel_3_4;
+	private JTextField tnombreitem;
 
 	/**
 	 * Launch the application.
@@ -965,33 +975,87 @@ public class GUI extends JFrame {
 		panelConsultas.setLayout(null);
 		
 		tnombreTabla = new JTextField();
-		tnombreTabla.setBounds(244, 38, 86, 20);
+		tnombreTabla.setBounds(124, 41, 129, 20);
 		panelConsultas.add(tnombreTabla);
 		tnombreTabla.setColumns(10);
 		
-		tfiltroregex = new JTextField();
-		tfiltroregex.setBounds(435, 41, 86, 20);
-		panelConsultas.add(tfiltroregex);
-		tfiltroregex.setColumns(10);
+		cbtipoclave = new JComboBox();
+		cbtipoclave.setModel(new DefaultComboBoxModel(new String[] {"Seleccione tipo", "String", "Number", "Boolean", "List"}));
+		cbtipoclave.setBounds(423, 41, 125, 20);
+		panelConsultas.add(cbtipoclave);
 		
 		baplicarfiltro = new JButton("Aplicar filtro");
-		baplicarfiltro.setBounds(293, 101, 89, 23);
+		baplicarfiltro.setBounds(380, 159, 89, 23);
 		panelConsultas.add(baplicarfiltro);
 		
 		JLabel lblNewLabel_1 = new JLabel("Nombre de tabla");
-		lblNewLabel_1.setBounds(137, 41, 97, 14);
+		lblNewLabel_1.setBounds(30, 44, 97, 14);
 		panelConsultas.add(lblNewLabel_1);
 		
-		JLabel lblNewLabel_3 = new JLabel("Filtro");
-		lblNewLabel_3.setBounds(379, 41, 46, 14);
+		JLabel lblNewLabel_3 = new JLabel("Tipo de Clave de partición");
+		lblNewLabel_3.setBounds(293, 44, 124, 17);
 		panelConsultas.add(lblNewLabel_3);
 		
 		JScrollPane scrollPane_2 = new JScrollPane();
-		scrollPane_2.setBounds(148, 135, 444, 260);
+		scrollPane_2.setBounds(207, 217, 444, 260);
 		panelConsultas.add(scrollPane_2);
 		
 		textArea = new JTextArea();
 		scrollPane_2.setViewportView(textArea);
+		
+		JLabel lblNewLabel_3_1 = new JLabel("Valor de clave de partición");
+		lblNewLabel_3_1.setBounds(558, 41, 135, 14);
+		panelConsultas.add(lblNewLabel_3_1);
+		
+		tvalorclave = new JTextField();
+		tvalorclave.setColumns(10);
+		tvalorclave.setBounds(703, 41, 86, 20);
+		panelConsultas.add(tvalorclave);
+		
+		JLabel lblNewLabel_3_2 = new JLabel("Tipo de Ítem");
+		lblNewLabel_3_2.setBounds(30, 90, 124, 17);
+		panelConsultas.add(lblNewLabel_3_2);
+		
+		cbtipoitem = new JComboBox();
+		cbtipoitem.setModel(new DefaultComboBoxModel(new String[] {"Seleccione tipo", "String", "Number", "Boolean", "List"}));
+		cbtipoitem.setBounds(160, 87, 125, 20);
+		panelConsultas.add(cbtipoitem);
+		
+		JLabel lblNewLabel_1_1 = new JLabel("Valor de Ítem");
+		lblNewLabel_1_1.setBounds(326, 90, 97, 14);
+		panelConsultas.add(lblNewLabel_1_1);
+		
+		tvaloritem = new JTextField();
+		tvaloritem.setColumns(10);
+		tvaloritem.setBounds(420, 87, 129, 20);
+		panelConsultas.add(tvaloritem);
+		
+		JLabel lblNewLabel_1_2 = new JLabel("Filtro con regex");
+		lblNewLabel_1_2.setBounds(582, 90, 97, 14);
+		panelConsultas.add(lblNewLabel_1_2);
+		
+		tfilterregex = new JTextField();
+		tfilterregex.setColumns(10);
+		tfilterregex.setBounds(676, 87, 129, 20);
+		panelConsultas.add(tfilterregex);
+		
+		lblNewLabel_3_3 = new JLabel("Nombre clave");
+		lblNewLabel_3_3.setBounds(808, 41, 151, 14);
+		panelConsultas.add(lblNewLabel_3_3);
+		
+		tnombreclaveparticion = new JTextField();
+		tnombreclaveparticion.setColumns(10);
+		tnombreclaveparticion.setBounds(953, 41, 86, 20);
+		panelConsultas.add(tnombreclaveparticion);
+		
+		lblNewLabel_3_4 = new JLabel("Nombre item");
+		lblNewLabel_3_4.setBounds(830, 87, 151, 14);
+		panelConsultas.add(lblNewLabel_3_4);
+		
+		tnombreitem = new JTextField();
+		tnombreitem.setColumns(10);
+		tnombreitem.setBounds(975, 87, 86, 20);
+		panelConsultas.add(tnombreitem);
 		baplicarfiltro.addActionListener(e->{
 			consultarElementosConFiltro();
 		});
@@ -1010,57 +1074,118 @@ public class GUI extends JFrame {
 			throw new IllegalArgumentException("Tipo de atributo no soportado para la actualización.");
 		}
 	}
+	private String generateFilterExpression(String filterKeyName, String filterKeyType, String regexPattern) {
+	    if (filterKeyType.equals("String")) {
+	        // Si es tipo String, usamos expresiones regulares
+	        if (regexPattern.startsWith("s/")) {
+	            // El formato es "s/regex/", ejemplo: "s/a.*b/" para cadenas que contengan "a" seguido de "b"
+	            String regex = regexPattern.substring(2); // Obtener el patrón de la expresión regular
+	            return "contains(" + filterKeyName + ", :filterValue)";  // Usamos "contains" para regex
+	        } else {
+	            // Si no es un regex, usamos contains por defecto
+	            return "contains(" + filterKeyName + ", :filterValue)";
+	        }
+	    } else if (filterKeyType.equals("Number")) {
+	        // Si es tipo Number, procesamos como comparación numérica
+	        if (regexPattern.contains(">")) {
+	            // Para comparaciones mayores que el valor
+	            String[] parts = regexPattern.split(">");
+	            if (parts.length == 2) {
+	                try {
+	                    int threshold = Integer.parseInt(parts[1].trim());
+	                    return filterKeyName + " > :filterValue";  // Compara si el valor del campo es mayor
+	                } catch (NumberFormatException e) {
+	                    JOptionPane.showMessageDialog(null, "Valor de comparación inválido para tipo Number", "Error", JOptionPane.ERROR_MESSAGE);
+	                    return "";
+	                }
+	            }
+	        } else if (regexPattern.contains("<")) {
+	            // Para comparaciones menores que el valor
+	            String[] parts = regexPattern.split("<");
+	            if (parts.length == 2) {
+	                try {
+	                    int threshold = Integer.parseInt(parts[1].trim());
+	                    return filterKeyName + " < :filterValue";  // Compara si el valor del campo es menor
+	                } catch (NumberFormatException e) {
+	                    JOptionPane.showMessageDialog(null, "Valor de comparación inválido para tipo Number", "Error", JOptionPane.ERROR_MESSAGE);
+	                    return "";
+	                }
+	            }
+	        } else if (regexPattern.contains("=")) {
+	            // Para comparaciones de igualdad
+	            String[] parts = regexPattern.split("=");
+	            if (parts.length == 2) {
+	                try {
+	                    int threshold = Integer.parseInt(parts[1].trim());
+	                    return filterKeyName + " = :filterValue";  // Compara si el valor del campo es igual
+	                } catch (NumberFormatException e) {
+	                    JOptionPane.showMessageDialog(null, "Valor de comparación inválido para tipo Number", "Error", JOptionPane.ERROR_MESSAGE);
+	                    return "";
+	                }
+	            }
+	        }
+	    }
 
-	public void consultarElementosConFiltro() {
-    String tableName = "TEST2";  // Nombre de la tabla
-    String partitionKeyName = "clave_participacion";  // Nombre de la clave de partición
-    String partitionKeyValue = "101";  // Valor de la clave de partición
-    String filterKeyName = "campo1";  // Campo a filtrar
-    String filterValue = "7";  // Valor del filtro
-    AmazonDynamoDB client = dynamoApp.getDynamoDB(); 
-    DynamoDB dynamoDB = new DynamoDB(client);
+	    return "";  // Si no se aplica ningún filtro, devolvemos vacío
+	}
 
-    // Establecer el filtro con la expresión
-    String keyConditionExpression = partitionKeyName + " = :partitionKeyValue";
-    String filterExpression = filterKeyName + " = :filterValue";
-    
-    Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-    expressionAttributeValues.put(":partitionKeyValue", new AttributeValue().withS(partitionKeyValue));  // Usar .withS() para String
-    expressionAttributeValues.put(":filterValue", new AttributeValue().withN(filterValue));  // Usar .withN() para número
+	private void consultarElementosConFiltro() {
+	    // Definir el nombre de la tabla
+	    String tableName = "test3";  // Asegúrate de que la tabla esté correctamente indicada
+	    String filterKeyName = "cadena";  // El campo en el que aplicar el filtro
+	    String regexPattern = "s/Dual.*";  // El patrón de filtrado (en este caso estamos buscando valores mayores a 6)
+	    String filterKeyType = "String";  // Tipo de filtro (en este caso estamos trabajando con números)
 
-    try {
-        // Crear la solicitud de consulta con la expresión de condición y filtro
-        QueryRequest queryRequest = new QueryRequest()
-            .withTableName(tableName)
-            .withKeyConditionExpression(keyConditionExpression)
-            .withFilterExpression(filterExpression)
-            .withExpressionAttributeValues(expressionAttributeValues);
+	    // Variable que almacena el nombre de la clave de partición
+	    String nombreClaveParticion = "clave";  // Este es el nombre de la clave de partición (puede ser otro campo si es diferente)
 
-        // Ejecutar la consulta
-        QueryResult result = client.query(queryRequest);
+	    AmazonDynamoDB client = dynamoApp.getDynamoDB();
+	    DynamoDB dynamoDB = new DynamoDB(client);
 
-        // Verificar si hay elementos en la respuesta
-        if (result.getItems().isEmpty()) {
-            textArea.append("No se encontraron resultados.\n");
-        } else {
-            // Procesar los resultados
-            for (Map<String, AttributeValue> item : result.getItems()) {
-                // Mostrar el resultado en el TextArea
-                StringBuilder sb = new StringBuilder();
-                for (Map.Entry<String, AttributeValue> entry : item.entrySet()) {
-                    sb.append(entry.getKey())
-                      .append(": ")
-                      .append(entry.getValue().getS())  // Asumiendo que es un valor String, cambia si es diferente
-                      .append("\n");
-                }
-                textArea.append(sb.toString() + "\n");
-                System.out.println("Resultado: " + sb.toString());
-            }
-        }
-    } catch (AmazonDynamoDBException e) {
-        System.err.println("Error de consulta: " + e.getMessage());
-    }
-}
+	    // Generar la expresión de filtro
+	    String filterExpression = generateFilterExpression(filterKeyName, filterKeyType, regexPattern);
+
+	    // Mapa para los valores de las expresiones
+	    Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
+	    expressionAttributeValues.put(":clave", new AttributeValue().withS("uno"));  // Asigna un valor válido para :clave
+
+	    // Para números, aseguramos que el valor para :filterValue sea un número
+	    expressionAttributeValues.put(":filterValue", new AttributeValue().withN("6"));  // Aquí pasamos el número 6 como valor para la comparación
+
+	    try {
+	        // Crear la solicitud de consulta
+	        QueryRequest queryRequest = new QueryRequest()
+	                .withTableName(tableName)
+	                .withKeyConditionExpression(nombreClaveParticion + " = :clave")  // Usamos la variable nombreClaveParticion aquí
+	                .withFilterExpression(filterExpression)  // Aplicamos la expresión con regex aquí
+	                .withExpressionAttributeValues(expressionAttributeValues);
+
+	        // Ejecutar la consulta
+	        QueryResult result = client.query(queryRequest);
+
+	        // Procesar los resultados
+	        if (result.getItems().isEmpty()) {
+	            textArea.append("No se encontraron resultados.\n");
+	        } else {
+	            for (Map<String, AttributeValue> item : result.getItems()) {
+	                StringBuilder sb = new StringBuilder();
+	                for (Map.Entry<String, AttributeValue> entry : item.entrySet()) {
+	                    if (entry.getValue().getS() != null) {
+	                        sb.append(entry.getKey()).append(": ").append(entry.getValue().getS()).append("\n");
+	                    } else if (entry.getValue().getN() != null) {
+	                        sb.append(entry.getKey()).append(": ").append(entry.getValue().getN()).append("\n");
+	                    }
+	                }
+	                textArea.append(sb.toString() + "\n");
+	            }
+	        }
+	    } catch (AmazonDynamoDBException e) {
+	        JOptionPane.showMessageDialog(null, "Error de consulta: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	        System.out.println(e.getMessage());
+	    }
+	}
+
+
 
 public Gestion_de_Tablas getGestionTablas() {
 		return gestionTablas;

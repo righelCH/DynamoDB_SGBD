@@ -20,7 +20,7 @@ Este proyecto es una interfaz gráfica en Java para interactuar con DynamoDB, pe
 ## 📦 Ejecutar el Proyecto  
 
 1. **Descargar el JAR**:  
-   👉 [SGBD_DynamoApp.jar](src/SGBD_DynamoApp.jar)  
+   👉 [SGBD_DynamoApp.jar](DynamoDB_SGBD/SGBD_DynamoApp.jar)  
 
 2. **Ejecutarlo** con Java:  
    ```bash

@@ -19,23 +19,23 @@ import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
 public class OperacionesCRUD {
 
-	private AmazonDynamoDB userAltoNivel;
-	
+	private AmazonDynamoDB userBajoNivel;
 
-	public OperacionesCRUD(AmazonDynamoDB userAltoNivel) {
-		this.userAltoNivel = userAltoNivel;
+	public OperacionesCRUD(AmazonDynamoDB userBajoNivel) {
+		this.userBajoNivel = userBajoNivel;
 
 	}
 
+	//-------------------------  CREATE/CREAR ITEM ------------------------------------------------------------------
 	public void crearItem(String selectedTable, String partitionKeyName, String partitionKeyValue, String sortKeyName,
 			String sortKeyValue, String attributeName, String attributeType, String attributeValue) {
 		try {
-			if (userAltoNivel == null) {
+			if (userBajoNivel == null) {
 				throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
 			}
 
 // Crear instancia de DynamoDB y seleccionar la tabla
-			DynamoDB dynamoDB = new DynamoDB(userAltoNivel);
+			DynamoDB dynamoDB = new DynamoDB(userBajoNivel);
 			Table table = dynamoDB.getTable(selectedTable);
 
 // Crear el ítem
@@ -113,45 +113,46 @@ public class OperacionesCRUD {
 
 	}
 
-	public void leerItem(String selectedTable, String partitionKeyName, String partitionKeyValue, 
-            String sortKeyName, String sortKeyValue, AmazonDynamoDB client) {
-try {
+	//------------------------- READ/LEER ITEM ------------------------------------------------------------------
+	public void leerItem(String selectedTable, String partitionKeyName, String partitionKeyValue, String sortKeyName,
+			String sortKeyValue, AmazonDynamoDB client) {
+		try {
 // Validar que la clave de partición esté presente
-if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
-   throw new IllegalArgumentException("La clave de partición y su valor son obligatorios para leer un ítem.");
-}
+			if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
+				throw new IllegalArgumentException(
+						"La clave de partición y su valor son obligatorios para leer un ítem.");
+			}
 
 // Crear instancia de DynamoDB y seleccionar la tabla
-DynamoDB dynamoDB = new DynamoDB(client);
-Table table = dynamoDB.getTable(selectedTable);
+			DynamoDB dynamoDB = new DynamoDB(client);
+			Table table = dynamoDB.getTable(selectedTable);
 
 // Leer el ítem, verificando si hay una clave de ordenación
-Item item;
-if (!sortKeyName.isEmpty() && !sortKeyValue.isEmpty()) {
-   item = table.getItem(partitionKeyName, partitionKeyValue, sortKeyName, sortKeyValue);
-} else {
-   item = table.getItem(partitionKeyName, partitionKeyValue);
-}
+			Item item;
+			if (!sortKeyName.isEmpty() && !sortKeyValue.isEmpty()) {
+				item = table.getItem(partitionKeyName, partitionKeyValue, sortKeyName, sortKeyValue);
+			} else {
+				item = table.getItem(partitionKeyName, partitionKeyValue);
+			}
 
 // Verificar si el ítem existe
-if (item != null) {
-   // Mostrar el ítem encontrado
-   JOptionPane.showMessageDialog(null, "Ítem encontrado:\n" + item.toJSONPretty(), 
-                                 "Ítem Encontrado", JOptionPane.INFORMATION_MESSAGE);
-} else {
-   JOptionPane.showMessageDialog(null, "No se encontró el ítem con la clave proporcionada.", 
-                                 "Ítem No Encontrado", JOptionPane.WARNING_MESSAGE);
-}
+			if (item != null) {
+				// Mostrar el ítem encontrado
+				JOptionPane.showMessageDialog(null, "Ítem encontrado:\n" + item.toJSONPretty(), "Ítem Encontrado",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(null, "No se encontró el ítem con la clave proporcionada.",
+						"Ítem No Encontrado", JOptionPane.WARNING_MESSAGE);
+			}
 
-} catch (Exception ex) {
-JOptionPane.showMessageDialog(null, "Error al leer el ítem: " + ex.getMessage(), "Error", 
-                             JOptionPane.ERROR_MESSAGE);
-ex.printStackTrace();
-}
-}
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, "Error al leer el ítem: " + ex.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+			ex.printStackTrace();
+		}
+	}
 
-
-	// Método para borrar un ítem de la tabla en DynamoDB
+	//------------------------- DELETE/BORRAR ITEM ------------------------------------------------------------------
 	public void borrarItem(String selectedTable, String partitionKeyName, String partitionKeyValue, String sortKeyName,
 			String sortKeyValue, AmazonDynamoDB client) {
 		try {
@@ -183,7 +184,7 @@ ex.printStackTrace();
 		}
 	}
 
-	
+	//------------------------- UPDATE/MODIFICAR ITEM ------------------------------------------------------------------
 	public void modificarItem(String selectedTable, String partitionKeyName, String partitionKeyValue,
 			String sortKeyName, String sortKeyValue, String attributeName, String attributeType, String attributeValue,
 			AmazonDynamoDB client) {
@@ -224,6 +225,7 @@ ex.printStackTrace();
 		}
 	}
 
+	
 // Método auxiliar para procesar el valor del atributo según su tipo
 	private static Object processAttributeValue(String attributeType, String attributeValue) {
 		switch (attributeType) {

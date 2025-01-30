@@ -2,12 +2,11 @@ package Righel_Backend;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
 
-import Laura_Fronted.GUI;
+
 import Laura_Fronted.LoginTab;
 
 import javax.swing.*;
@@ -32,7 +31,7 @@ public class DynamoApp {
 		this.accessKeyId = accessKeyId;
 		this.secretKey = secretKey;
 		this.region = region;
-		this.frameGUI = frameGUI;
+		this.setFrameGUI(frameGUI);
 
 		// Conectar a DynamoDB
 		connectToDynamoDB();
@@ -62,11 +61,14 @@ public class DynamoApp {
 				BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKeyId, secretKey);
 				this.userBajoNivel = AmazonDynamoDBClientBuilder.standard()
 						.withCredentials(new AWSStaticCredentialsProvider(awsCreds))
-						.withRegion(Regions.fromName(region)).build();
+						.withRegion(region).build();
 
-				ListTablesResult result = userBajoNivel.listTables();
-				JOptionPane.showMessageDialog(null, "Conexión exitosa.");
+			   //Comprobar que tenemos conexion listando las tablas que existan
+			    ListTablesResult result = userBajoNivel.listTables();
 				System.out.println("Conexión exitosa. Tablas disponibles: " + result.getTableNames());
+				
+				JOptionPane.showMessageDialog(null, "Conexión exitosa.");
+			
 
 				// Abrir GUI y cerrar la ventana de inicio
 				
@@ -81,5 +83,13 @@ public class DynamoApp {
 	// Método para obtener la conexión (opcional)
 	public AmazonDynamoDB getDynamoDB() {
 		return userBajoNivel;
+	}
+
+	public LoginTab getFrameGUI() {
+		return frameGUI;
+	}
+
+	public void setFrameGUI(LoginTab frameGUI) {
+		this.frameGUI = frameGUI;
 	}
 }

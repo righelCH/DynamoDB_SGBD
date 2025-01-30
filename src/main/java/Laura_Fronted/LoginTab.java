@@ -6,6 +6,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
+import com.formdev.flatlaf.FlatLightLaf;
+
 import Righel_Backend.DynamoApp;
 
 import java.awt.Toolkit;
@@ -57,8 +59,7 @@ public class LoginTab extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel");
-					
+					 UIManager.setLookAndFeel( new FlatLightLaf() );
 					LoginTab frame = new LoginTab();
 					frame.setVisible(true);
 				} catch (Exception e) {
@@ -84,7 +85,7 @@ public class LoginTab extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1200, 700);
 		contentPane = new JPanel();
-		contentPane.setBackground(new Color(198, 226, 255));
+		contentPane.setBackground(Color.decode("#BBE9FF"));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setResizable(false);
 		setLocationRelativeTo(null);
@@ -182,17 +183,14 @@ public class LoginTab extends JFrame {
 					tfusuario.setBorder(null);
 					passwordField.setBorder(null);
 					comboRegion.setBorder(null);
-				 dynamoApp=	 new DynamoApp(" AKIA3C6FL6TAJVER4NWP", "Ao0igG5BTy4JjYBk7uwtipaInf1KsPBdkGs/2uu5", comboRegion.getSelectedItem().toString(), LoginTab.this);
+				 dynamoApp=	 new DynamoApp(tfusuario.getText(), String.valueOf(passwordField.getPassword()), comboRegion.getSelectedItem().toString(), LoginTab.this);
 				 GUI gui = new GUI(dynamoApp);
 					gui.setVisible(true);
 				//	frame.dispose();	
-				 //user.connectToDynamoDB(tfusuario.getText(), String.valueOf(passwordField.getPassword()), comboRegion.getSelectedItem().toString(), Principal.this);
-
-	
 				}
 			}
 		});
-		btnEntrar.setBackground(new Color(204, 204, 255));
+		btnEntrar.setBackground(Color.decode("#00FF9C"));
 		btnEntrar.setFont(new Font("Georgia", Font.BOLD, 30));
 		btnEntrar.setBounds(461, 484, 202, 64);
 		contentPane.add(btnEntrar);

@@ -7,14 +7,8 @@ import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
-import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
-import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-
 import java.util.HashMap;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Table;
-
 public class Consultas {
     private AmazonDynamoDB userBajoNivel;
     private DynamoDB dynamoDB;
@@ -24,7 +18,7 @@ public class Consultas {
         if (userBajoNivel == null) {
             throw new IllegalArgumentException("El cliente AmazonDynamoDB no puede ser null");
         }
-        this.userBajoNivel = userBajoNivel;
+        this.setUserBajoNivel(userBajoNivel);
         this.dynamoDB = new DynamoDB(userBajoNivel);  // Se usa DynamoDB constructor correctamente
     }
 
@@ -68,5 +62,13 @@ public class Consultas {
             ex.printStackTrace();
         }
     }
+
+	public AmazonDynamoDB getUserBajoNivel() {
+		return userBajoNivel;
+	}
+
+	public void setUserBajoNivel(AmazonDynamoDB userBajoNivel) {
+		this.userBajoNivel = userBajoNivel;
+	}
 
 }

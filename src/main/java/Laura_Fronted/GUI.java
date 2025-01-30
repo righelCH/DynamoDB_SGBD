@@ -1,14 +1,11 @@
 package Laura_Fronted;
 
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import java.awt.Toolkit;
 import javax.swing.JTabbedPane;
-
 import javax.swing.ImageIcon;
 import java.awt.Color;
 import javax.swing.JButton;
@@ -21,29 +18,14 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.ItemCollection;
-import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
-import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
-import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
-import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
-import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
-import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.services.dynamodbv2.model.QueryResult;
-import com.amazonaws.services.dynamodbv2.model.ScanRequest;
-import com.amazonaws.services.dynamodbv2.model.ScanResult;
+import com.formdev.flatlaf.FlatLightLaf;
 
 import Righel_Backend.DynamoApp;
-import Righel_Backend.Gestion_de_Tablas;
-
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -54,21 +36,15 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.JTable;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JTextArea;
+import javax.swing.border.EtchedBorder;
 
 public class GUI extends JFrame {
 	private static DynamoApp dynamoApp;
@@ -116,7 +92,7 @@ public class GUI extends JFrame {
 	private JButton btnActualizar;
 	private JLabel lblTipo;
 	private JLabel lblValor;
-	
+
 	private JTextField tfnombreclaveParticioncrud;
 	private JTextField tfValorUnicoParticioncrud;
 	private JTextField tfvalorclaveparticioncrud;
@@ -129,13 +105,17 @@ public class GUI extends JFrame {
 
 	private DefaultTableModel dtm;
 	private JButton btnActualizarTabla;
-	private JComboBox cbnombretabla;
+	private JComboBox<String> cbnombretabla;
 	private JButton bbuscar;
 	private JTextArea textArea;
 	private JTextField tvalorclav;
-	private JLabel lblNewLabel_3_3;
+	private JLabel lnombreclaveconsulta;
 	private JTextField tnombreclavep;
 	private AmazonDynamoDB userBajoNivel;
+	private JLabel lnombretablaconsulta;
+	private JScrollPane scrollPane_2;
+	private JLabel lvalorclaveparticionconsulta;
+	private JLabel lconsultasid;
 
 	/**
 	 * Launch the application.
@@ -144,15 +124,7 @@ public class GUI extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-
-					// -
-					//
-					
-					
-					// ----
-					// UIManager.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
-		UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel");
-					
+					UIManager.setLookAndFeel(new FlatLightLaf());
 					GUI frame = new GUI(dynamoApp);
 					frame.setVisible(true);
 				} catch (Exception e) {
@@ -169,9 +141,9 @@ public class GUI extends JFrame {
 	 * @param dynamoApp
 	 */
 	public GUI(DynamoApp dynamoApp) {
-		this.dynamoApp=dynamoApp;
-	
-		userBajoNivel= dynamoApp.getDynamoDB();
+		GUI.dynamoApp = dynamoApp;
+
+		userBajoNivel = dynamoApp.getDynamoDB();
 		String[] columnas = {};
 		dtm = new DefaultTableModel(columnas, 0) {
 			private static final long serialVersionUID = 1L;
@@ -201,8 +173,7 @@ public class GUI extends JFrame {
 				super.fireTableStructureChanged();
 			}
 		};
-		
-		
+
 		setTitle("DynamoDB");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(GUI.class.getResource("/multimedia/Icono_dynamo.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -215,32 +186,35 @@ public class GUI extends JFrame {
 		contentPane.setLayout(null);
 
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBackground(new Color(102, 255, 140));
+		tabbedPane.setBackground(Color.decode("#FFE700"));
 		tabbedPane.setBounds(0, 0, 1190, 663);
 		contentPane.add(tabbedPane);
 
 		panelGestionTabla = new JPanel();
-		panelGestionTabla.setBackground(new Color(215, 235, 255));
-		tabbedPane.addTab("Gestión Tabla", null, panelGestionTabla, null);
+		panelGestionTabla.setBackground(Color.decode("#BBE9FF"));
+		tabbedPane.addTab("Gestión Tabla", new ImageIcon(GUI.class.getResource("/multimedia/gestion-de-proyectos.png")),
+				panelGestionTabla, null);
 		panelGestionTabla.setLayout(null);
 
 		btnMostrarTablas = new JButton("Abrir Tabla");
+		btnMostrarTablas.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/abrir-correo-electronico.png")));
 		btnMostrarTablas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String selectedTable = listaTablas.getSelectedValue();
-		        if (selectedTable != null) {
-		         dynamoApp.gestorTablas.cargarDatosTabla(selectedTable,tablaDatos); // Cargar los datos de la tabla seleccionada
-		            tabbedPane.setSelectedComponent(panelCRUD); // Cambiar a la pestaña CRUD
-		        } else {
-		            JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
-		                    JOptionPane.ERROR_MESSAGE);
-		        }
+				if (selectedTable != null) {
+					dynamoApp.gestorTablas.cargarDatosTabla(selectedTable, tablaDatos); // Cargar los datos de la tabla
+																						// seleccionada
+					tabbedPane.setSelectedComponent(panelCRUD); // Cambiar a la pestaña CRUD
+				} else {
+					JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
-		
-		btnMostrarTablas.setBorder(new LineBorder(new Color(242, 165, 70)));
+
+		btnMostrarTablas.setBorder(new LineBorder(new Color(255, 255, 255)));
 		btnMostrarTablas.setFont(new Font("Georgia", Font.BOLD, 14));
-		btnMostrarTablas.setBackground(new Color(215, 215, 255));
+		btnMostrarTablas.setBackground(Color.decode("#00FF9C"));
 		btnMostrarTablas.setBounds(858, 412, 230, 43);
 		panelGestionTabla.add(btnMostrarTablas);
 
@@ -250,29 +224,28 @@ public class GUI extends JFrame {
 		panelGestionTabla.add(scrollPane);
 
 		listaTablas = new JList<String>();
+		listaTablas.setBackground(Color.decode("#FEFFA7"));
 		scrollPane.setViewportView(listaTablas);
 		listaTablas.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 160)), "<html><b>Tablas</html>",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		listaTablas.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) { // Asegúrate de que la selección no se esté ajustando
+				if (!e.getValueIsAdjusting()) { // Asegurar que la selección no se esté ajustando
 					String selectedTable = listaTablas.getSelectedValue();
 					if (selectedTable != null) {
-						   dynamoApp.gestorTablas.cargarDatosTabla(selectedTable,tablaDatos);
+						dynamoApp.gestorTablas.cargarDatosTabla(selectedTable, tablaDatos);
 					}
 				}
 			}
 
 		});
 
-		
-		
 		btnCrearTabla = new JButton(" Crear Tabla");
 		btnCrearTabla.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					
+
 					if (userBajoNivel == null) {
 						throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
 					}
@@ -355,25 +328,25 @@ public class GUI extends JFrame {
 					// Llamada al método para crear la tabla
 					if (tipoordenacion.isEmpty()) {
 						// Sin clave de ordenación
-				             dynamoApp.gestorTablas.crearTabla(tfnombretabla.getText(), tfclaveparticion.getText(), tipoparticion,
-				            		 null,tipoordenacion, provision, caplectura, cap1escritura);
-					
+						dynamoApp.gestorTablas.crearTabla(tfnombretabla.getText(), tfclaveparticion.getText(),
+								tipoparticion, null, tipoordenacion, provision, caplectura, cap1escritura);
+
 					} else {
 						// Con clave de ordenación
-						dynamoApp.gestorTablas.crearTabla(tfnombretabla.getText(), tfclaveparticion.getText(), tipoparticion,
-								tfnombreordenacion.getText(),tipoordenacion, provision, caplectura, cap1escritura);
+						dynamoApp.gestorTablas.crearTabla(tfnombretabla.getText(), tfclaveparticion.getText(),
+								tipoparticion, tfnombreordenacion.getText(), tipoordenacion, provision, caplectura,
+								cap1escritura);
 					}
-					
 
 				} catch (Exception ex) {
 					JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
 				}
 			}
-		});
+		}); // 00FF9C
 		btnCrearTabla.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/escribir.png")));
 		btnCrearTabla.setFont(new Font("Georgia", Font.BOLD, 14));
-		btnCrearTabla.setBorder(new LineBorder(new Color(242, 165, 70)));
-		btnCrearTabla.setBackground(new Color(215, 215, 255));
+		btnCrearTabla.setBorder(new LineBorder(new Color(255, 255, 255)));
+		btnCrearTabla.setBackground(Color.decode("#00FF9C"));
 		btnCrearTabla.setBounds(463, 521, 217, 43);
 		panelGestionTabla.add(btnCrearTabla);
 
@@ -465,7 +438,7 @@ public class GUI extends JFrame {
 			}
 		});
 		cbprovision.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		cbprovision.setBackground(new Color(215, 235, 255));
+		cbprovision.setBackground(Color.decode("#BBE9FF"));
 		cbprovision.setBounds(473, 314, 53, 43);
 		panelGestionTabla.add(cbprovision);
 
@@ -496,21 +469,23 @@ public class GUI extends JFrame {
 		panelGestionTabla.add(spinnerescritura);
 
 		btnActualizar = new JButton("Mostrar lista de tablas");
-		btnActualizar.setBorder(new LineBorder(new Color(255, 128, 64)));
-		btnActualizar.setBackground(new Color(213, 213, 255));
+		btnActualizar.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/mostrar-contrasena.png")));
+
+		btnActualizar.setBorder(new LineBorder(new Color(255, 255, 255)));
+		btnActualizar.setBackground(Color.decode("#00FF9C"));
 		btnActualizar.setFont(new Font("Georgia", Font.BOLD, 14));
 		btnActualizar.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 
 				try {
-					
+
 					if (userBajoNivel == null) {
 						throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
 					}
 
-					List<String> tablas =dynamoApp.gestorTablas.listarTablas();
-					
+					List<String> tablas = dynamoApp.gestorTablas.listarTablas();
+
 					if (tablas.isEmpty()) {
 						lresulgestion.setText("No hay tablas disponibles");
 					} else {
@@ -534,8 +509,9 @@ public class GUI extends JFrame {
 		panelGestionTabla.add(btnActualizar);
 
 		panelCRUD = new JPanel();
-		panelCRUD.setBackground(new Color(217, 236, 255));
-		tabbedPane.addTab("CRUD", null, panelCRUD, null);
+		panelCRUD.setBackground(Color.decode("#BBE9FF"));
+		tabbedPane.addTab("CRUD", new ImageIcon(GUI.class.getResource("/multimedia/datos-desestructurados.png")),
+				panelCRUD, null);
 		panelCRUD.setLayout(null);
 
 		ltitulo = new JLabel("Gestión de Datos con Operaciones CRUD");
@@ -580,46 +556,52 @@ public class GUI extends JFrame {
 		panelCRUD.add(tfvaloratributocrud);
 
 		btnCrearItem = new JButton("Crear Item");
+		btnCrearItem.setBackground(Color.decode("#00FF9C"));
+		btnCrearItem.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/varita-magica.png")));
 		btnCrearItem.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        try {
-		            // Obtener el nombre de la tabla seleccionada desde el JList
-		            String selectedTable = listaTablas.getSelectedValue(); // listaTablas es tu JList
-		            if (selectedTable == null || selectedTable.isEmpty()) {
-		                JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
-		                        JOptionPane.ERROR_MESSAGE);
-		                return;
-		            }
+			public void actionPerformed(ActionEvent e) {
+				try {
+					// Obtener el nombre de la tabla seleccionada desde el JList
+					String selectedTable = listaTablas.getSelectedValue(); 
+					if (selectedTable == null || selectedTable.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-		            // Capturar los valores ingresados por el usuario
-		            String partitionKeyName = tfnombreclaveParticioncrud.getText().trim(); // Nombre de la clave de partición
-		            String partitionKeyValue = tfvalorclaveparticioncrud.getText().trim(); // Valor de la clave de partición
-		            String sortKeyName = tfValorUnicoParticioncrud.getText().trim(); // Nombre de la clave de ordenación
-		            String sortKeyValue = tfvalorclaveordenacioncrud.getText().trim(); // Valor de la clave de ordenación
-		            String attributeName = tfnombreatributocrud.getText().trim(); // Nombre del atributo adicional
-		            String attributeType = combotipocrud.getSelectedItem().toString(); // Tipo del atributo adicional
-		            String attributeValue = tfvaloratributocrud.getText().trim(); // Valor del atributo adicional
+					// Capturar los valores ingresados por el usuario
+					String partitionKeyName = tfnombreclaveParticioncrud.getText().trim(); // Nombre de la clave de
+																							// partición
+					String partitionKeyValue = tfvalorclaveparticioncrud.getText().trim(); // Valor de la clave de
+																							// partición
+					String sortKeyName = tfValorUnicoParticioncrud.getText().trim(); // Nombre de la clave de ordenación
+					String sortKeyValue = tfvalorclaveordenacioncrud.getText().trim(); // Valor de la clave de
+																						// ordenación
+					String attributeName = tfnombreatributocrud.getText().trim(); // Nombre del atributo adicional
+					String attributeType = combotipocrud.getSelectedItem().toString(); // Tipo del atributo adicional
+					String attributeValue = tfvaloratributocrud.getText().trim(); // Valor del atributo adicional
 
-		            // Validar campos obligatorios
-		            if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
-		                JOptionPane.showMessageDialog(null,
-		                        "La clave de partición y su valor son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
-		                return;
-		            }
+					// Validar campos obligatorios
+					if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "La clave de partición y su valor son obligatorios.",
+								"Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-		            if (attributeName.isEmpty() || attributeValue.isEmpty() || attributeType.equals("Seleccione")) {
-		                JOptionPane.showMessageDialog(null,
-		                        "Debe proporcionar un atributo, su tipo y su valor.", "Error", JOptionPane.ERROR_MESSAGE);
-		                return;
-		            }
-		            
-		            dynamoApp.operacion.crearItem(selectedTable, partitionKeyName, partitionKeyValue, sortKeyName, sortKeyValue,
-		                    attributeName, attributeType, attributeValue);
+					if (attributeName.isEmpty() || attributeValue.isEmpty() || attributeType.equals("Seleccione")) {
+						JOptionPane.showMessageDialog(null, "Debe proporcionar un atributo, su tipo y su valor.",
+								"Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-		        } catch (Exception ex) {
-		            JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		        }
-		    }
+					dynamoApp.operacion.crearItem(selectedTable, partitionKeyName, partitionKeyValue, sortKeyName,
+							sortKeyValue, attributeName, attributeType, attributeValue);
+
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		});
 
 		btnCrearItem.setFont(new Font("Georgia", Font.BOLD, 14));
@@ -627,97 +609,102 @@ public class GUI extends JFrame {
 		panelCRUD.add(btnCrearItem);
 
 		btnBorrarItem = new JButton("Borrar Item");
+		btnBorrarItem.setBackground(Color.decode("#00FF9C"));
+		btnBorrarItem.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/goma-de-borrar.png")));
 		btnBorrarItem.addActionListener(new ActionListener() {
-    public void actionPerformed(ActionEvent e) {
-        try {
-            // Obtener el nombre de la tabla seleccionada
-            String selectedTable = listaTablas.getSelectedValue();
-            if (selectedTable == null || selectedTable.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+			public void actionPerformed(ActionEvent e) {
+				try {
+					// Obtener el nombre de la tabla seleccionada
+					String selectedTable = listaTablas.getSelectedValue();
+					if (selectedTable == null || selectedTable.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-            // Capturar las claves
-            String partitionKeyName = tfnombreclaveParticioncrud.getText().trim();
-            String partitionKeyValue = tfvalorclaveparticioncrud.getText().trim();
-            String sortKeyName = tfValorUnicoParticioncrud.getText().trim();
-            String sortKeyValue = tfvalorclaveordenacioncrud.getText().trim();
+					// Capturar las claves
+					String partitionKeyName = tfnombreclaveParticioncrud.getText().trim();
+					String partitionKeyValue = tfvalorclaveparticioncrud.getText().trim();
+					String sortKeyName = tfValorUnicoParticioncrud.getText().trim();
+					String sortKeyValue = tfvalorclaveordenacioncrud.getText().trim();
 
-            if (userBajoNivel == null) {
-                throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
-            }
+					if (userBajoNivel == null) {
+						throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
+					}
 
-            dynamoApp.operacion.borrarItem(selectedTable, partitionKeyName, partitionKeyValue, sortKeyName, sortKeyValue, userBajoNivel);
+					dynamoApp.operacion.borrarItem(selectedTable, partitionKeyName, partitionKeyValue, sortKeyName,
+							sortKeyValue, userBajoNivel);
 
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error al borrar el ítem: " + ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        }
-    }
-});
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(null, "Error al borrar el ítem: " + ex.getMessage(), "Error",
+							JOptionPane.ERROR_MESSAGE);
+					ex.printStackTrace();
+				}
+			}
+		});
 
-		
-		
-		
 		btnBorrarItem.setFont(new Font("Georgia", Font.BOLD, 14));
 		btnBorrarItem.setBounds(804, 183, 203, 39);
 		panelCRUD.add(btnBorrarItem);
 
 		btnModificarItem = new JButton("Modificar Item");
+		btnModificarItem.setBackground(Color.decode("#00FF9C"));
+		btnModificarItem.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/editar.png")));
 		btnModificarItem.addActionListener(new ActionListener() {
-    public void actionPerformed(ActionEvent e) {
-        try {
-            // Obtener el nombre de la tabla seleccionada
-            String selectedTable = listaTablas.getSelectedValue();
-            if (selectedTable == null || selectedTable.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+			public void actionPerformed(ActionEvent e) {
+				try {
+					// Obtener el nombre de la tabla seleccionada
+					String selectedTable = listaTablas.getSelectedValue();
+					if (selectedTable == null || selectedTable.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-            // Capturar claves y datos a modificar
-            String partitionKeyName = tfnombreclaveParticioncrud.getText().trim(); // Nombre de la clave de partición
-            String partitionKeyValue = tfvalorclaveparticioncrud.getText().trim(); // Valor de la clave de partición
-            String sortKeyName = tfValorUnicoParticioncrud.getText().trim(); // Nombre de la clave de ordenación
-            String sortKeyValue = tfvalorclaveordenacioncrud.getText().trim(); // Valor de la clave de ordenación
-            String attributeName = tfnombreatributocrud.getText().trim(); // Nombre del atributo adicional
-            String attributeType = combotipocrud.getSelectedItem().toString(); // Tipo del atributo adicional
-            String attributeValue = tfvaloratributocrud.getText().trim(); // Valor del atributo adicional
+					// Capturar claves y datos a modificar
+					String partitionKeyName = tfnombreclaveParticioncrud.getText().trim(); // Nombre de la clave de
+																							// partición
+					String partitionKeyValue = tfvalorclaveparticioncrud.getText().trim(); // Valor de la clave de
+																							// partición
+					String sortKeyName = tfValorUnicoParticioncrud.getText().trim(); // Nombre de la clave de ordenación
+					String sortKeyValue = tfvalorclaveordenacioncrud.getText().trim(); // Valor de la clave de
+																						// ordenación
+					String attributeName = tfnombreatributocrud.getText().trim(); // Nombre del atributo adicional
+					String attributeType = combotipocrud.getSelectedItem().toString(); // Tipo del atributo adicional
+					String attributeValue = tfvaloratributocrud.getText().trim(); // Valor del atributo adicional
 
-            // Validar campos
-            if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
-                JOptionPane.showMessageDialog(null,
-                        "La clave de partición y su valor son obligatorios para modificar un ítem.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+					// Validar campos
+					if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
+						JOptionPane.showMessageDialog(null,
+								"La clave de partición y su valor son obligatorios para modificar un ítem.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-            if (attributeName.isEmpty() || attributeValue.isEmpty() || attributeType.equals("Seleccione")) {
-                JOptionPane.showMessageDialog(null,
-                        "Debe proporcionar el nombre, tipo y valor del atributo a modificar.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+					if (attributeName.isEmpty() || attributeValue.isEmpty() || attributeType.equals("Seleccione")) {
+						JOptionPane.showMessageDialog(null,
+								"Debe proporcionar el nombre, tipo y valor del atributo a modificar.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-            if (userBajoNivel == null) {
-                throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
-            }
+					if (userBajoNivel == null) {
+						throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
+					}
 
-            // Llamar a la operación para modificar el ítem utilizando la estructura de dynamoApp.operacion
-            dynamoApp.operacion.modificarItem(selectedTable, partitionKeyName, partitionKeyValue, 
-                                              sortKeyName, sortKeyValue, attributeName, attributeType, 
-                                              attributeValue, userBajoNivel);
+					// Llamar a la operación para modificar el ítem utilizando la estructura de
+					// dynamoApp.operacion
+					dynamoApp.operacion.modificarItem(selectedTable, partitionKeyName, partitionKeyValue, sortKeyName,
+							sortKeyValue, attributeName, attributeType, attributeValue, userBajoNivel);
 
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error al modificar el ítem: " + ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        }
-    }
-});
-	btnModificarItem.setFont(new Font("Georgia", Font.BOLD, 14));
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(null, "Error al modificar el ítem: " + ex.getMessage(), "Error",
+							JOptionPane.ERROR_MESSAGE);
+					ex.printStackTrace();
+				}
+			}
+		});
+		btnModificarItem.setFont(new Font("Georgia", Font.BOLD, 14));
 		btnModificarItem.setBounds(804, 228, 203, 39);
 		panelCRUD.add(btnModificarItem);
 
@@ -791,68 +778,76 @@ public class GUI extends JFrame {
 		panelCRUD.add(tfvalorclaveordenacioncrud);
 
 		btnLeerItem = new JButton("Leer item");
+		btnLeerItem.setBackground(Color.decode("#00FF9C"));
+		btnLeerItem.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/leer.png")));
 		btnLeerItem.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        try {
-		            // Obtener el nombre de la tabla seleccionada desde el JList
-		            String selectedTable = listaTablas.getSelectedValue();
-		            if (selectedTable == null || selectedTable.isEmpty()) {
-		                JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
-		                        JOptionPane.ERROR_MESSAGE);
-		                return;
-		            }
+			public void actionPerformed(ActionEvent e) {
+				try {
+					// Obtener el nombre de la tabla seleccionada desde el JList
+					String selectedTable = listaTablas.getSelectedValue();
+					if (selectedTable == null || selectedTable.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-		            // Capturar las claves
-		            String partitionKeyName = tfnombreclaveParticioncrud.getText().trim(); // Nombre de la clave de partición
-		            String partitionKeyValue = tfvalorclaveparticioncrud.getText().trim(); // Valor de la clave de partición
-		            String sortKeyName = tfValorUnicoParticioncrud.getText().trim(); // Nombre de la clave de ordenación
-		            String sortKeyValue = tfvalorclaveordenacioncrud.getText().trim(); // Valor de la clave de ordenación
+					// Capturar las claves
+					String partitionKeyName = tfnombreclaveParticioncrud.getText().trim(); // Nombre de la clave de
+																							// partición
+					String partitionKeyValue = tfvalorclaveparticioncrud.getText().trim(); // Valor de la clave de
+																							// partición
+					String sortKeyName = tfValorUnicoParticioncrud.getText().trim(); // Nombre de la clave de ordenación
+					String sortKeyValue = tfvalorclaveordenacioncrud.getText().trim(); // Valor de la clave de
+																						// ordenación
 
-		            // Validar campos obligatorios
-		            if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
-		                JOptionPane.showMessageDialog(null,
-		                        "La clave de partición y su valor son obligatorios para leer un ítem.", "Error",
-		                        JOptionPane.ERROR_MESSAGE);
-		                return;
-		            }
+					// Validar campos obligatorios
+					if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
+						JOptionPane.showMessageDialog(null,
+								"La clave de partición y su valor son obligatorios para leer un ítem.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-		            // Llamar al método para leer el ítem
-		            dynamoApp.operacion.leerItem(selectedTable, partitionKeyName, partitionKeyValue, sortKeyName, sortKeyValue, userBajoNivel);
+					// Llamar al método para leer el ítem
+					dynamoApp.operacion.leerItem(selectedTable, partitionKeyName, partitionKeyValue, sortKeyName,
+							sortKeyValue, userBajoNivel);
 
-		        } catch (Exception ex) {
-		            JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		        }
-		    }
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		});
 		btnLeerItem.setFont(new Font("Georgia", Font.BOLD, 14));
 		btnLeerItem.setBounds(804, 280, 203, 39);
 		panelCRUD.add(btnLeerItem);
-		
-		btnActualizarTabla = new JButton("Actualizar Tabla");
-		btnActualizarTabla.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        String selectedTable = listaTablas.getSelectedValue();
-		        
-		        if (selectedTable != null) {
-		            
-		            if (userBajoNivel == null) {
-		                JOptionPane.showMessageDialog(null, "El cliente DynamoDB no está inicializado.", "Error",
-		                        JOptionPane.ERROR_MESSAGE);
-		                return;
-		            }
 
-		           
-		            dynamoApp.gestorTablas.cargarDatosTabla(selectedTable, tablaDatos);
+		btnActualizarTabla = new JButton("Actualizar Tabla");
+		btnActualizarTabla.setBackground(Color.decode("#00FF9C"));
+		btnActualizarTabla.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/actualizar-base-de-datos.png")));
+		btnActualizarTabla.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String selectedTable = listaTablas.getSelectedValue();
+
+				if (selectedTable != null) {
+
+					if (userBajoNivel == null) {
+						JOptionPane.showMessageDialog(null, "El cliente DynamoDB no está inicializado.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+
+					dynamoApp.gestorTablas.cargarDatosTabla(selectedTable, tablaDatos);
 
 //		            // Notificar que los datos han sido actualizados (aunque esto ya lo maneja el método cargarDatosTabla)
 //		            DefaultTableModel dtm = (DefaultTableModel) tablaDatos.getModel();
 //		            dtm.fireTableDataChanged();
 //		            dtm.fireTableStructureChanged();
-		        } else {
-		            JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
-		                    JOptionPane.ERROR_MESSAGE);
-		        }
-		    }
+				} else {
+					JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		});
 
 		btnActualizarTabla.setFont(new Font("Georgia", Font.BOLD, 14));
@@ -860,205 +855,231 @@ public class GUI extends JFrame {
 		panelCRUD.add(btnActualizarTabla);
 
 		panelConsultas = new JPanel();
-		panelConsultas.setBackground(new Color(217, 236, 255));
-		tabbedPane.addTab("Consultas", null, panelConsultas, null);
+		panelConsultas.setBackground(Color.decode("#BBE9FF"));
+		tabbedPane.addTab("Consultas", new ImageIcon(GUI.class.getResource("/multimedia/busqueda-de-datos.png")),
+				panelConsultas, null);
 		panelConsultas.setLayout(null);
-		
+
 		cbnombretabla = new JComboBox<String>();
-		cbnombretabla.setBounds(124, 41, 129, 20);
-	cargarTablasEnComboBox(cbnombretabla);
+		cbnombretabla.setFont(new Font("Georgia", Font.BOLD, 16));
+		cbnombretabla.setBounds(346, 149, 178, 32);
+		cargarTablasEnComboBox(cbnombretabla);
 		panelConsultas.add(cbnombretabla);
-		
+
 		bbuscar = new JButton("Buscar");
-		bbuscar.setBounds(380, 159, 89, 23);
+		bbuscar.setBackground(Color.decode("#00FF9C"));
+		bbuscar.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/lupa.png")));
+		bbuscar.setFont(new Font("Georgia", Font.BOLD, 18));
+		bbuscar.setBounds(346, 386, 178, 44);
 		panelConsultas.add(bbuscar);
-		
-		JLabel lblNewLabel_1 = new JLabel("Nombre de tabla");
-		lblNewLabel_1.setBounds(30, 44, 97, 14);
-		panelConsultas.add(lblNewLabel_1);
-		
-		JScrollPane scrollPane_2 = new JScrollPane();
-		scrollPane_2.setBounds(207, 217, 444, 260);
+
+		lnombretablaconsulta = new JLabel("Nombre de tabla");
+		lnombretablaconsulta.setFont(new Font("Georgia", Font.BOLD, 18));
+		lnombretablaconsulta.setBounds(68, 158, 192, 23);
+		panelConsultas.add(lnombretablaconsulta);
+
+		scrollPane_2 = new JScrollPane();
+		scrollPane_2.setForeground(new Color(0, 128, 64));
+		scrollPane_2.setFont(new Font("Tahoma", Font.BOLD, 14));
+		scrollPane_2.setBounds(677, 146, 459, 299);
 		panelConsultas.add(scrollPane_2);
-		
+
 		textArea = new JTextArea();
+		textArea.setBorder(new TitledBorder(
+				new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)),
+				"<html><b>Resultados de b\u00FAsqueda en formato JSON</html>", TitledBorder.CENTER, TitledBorder.TOP,
+				null, new Color(0, 0, 160)));
 		scrollPane_2.setViewportView(textArea);
-		
-		JLabel lblNewLabel_3_1 = new JLabel("Valor de clave de partición");
-		lblNewLabel_3_1.setBounds(525, 44, 135, 14);
-		panelConsultas.add(lblNewLabel_3_1);
-		
+
+		lvalorclaveparticionconsulta = new JLabel("Valor de clave de partición");
+		lvalorclaveparticionconsulta.setFont(new Font("Georgia", Font.BOLD, 18));
+		lvalorclaveparticionconsulta.setBounds(68, 281, 269, 32);
+		panelConsultas.add(lvalorclaveparticionconsulta);
+
 		tvalorclav = new JTextField();
+		tvalorclav.setFont(new Font("Georgia", Font.BOLD, 16));
 		tvalorclav.setColumns(10);
-		tvalorclav.setBounds(657, 41, 86, 20);
+		tvalorclav.setBounds(346, 277, 178, 32);
 		panelConsultas.add(tvalorclav);
-		
-		lblNewLabel_3_3 = new JLabel("Nombre clave");
-		lblNewLabel_3_3.setBounds(308, 44, 151, 14);
-		panelConsultas.add(lblNewLabel_3_3);
-		
+
+		lnombreclaveconsulta = new JLabel("Nombre clave");
+		lnombreclaveconsulta.setFont(new Font("Georgia", Font.BOLD, 18));
+		lnombreclaveconsulta.setBounds(69, 223, 151, 14);
+		panelConsultas.add(lnombreclaveconsulta);
+
 		tnombreclavep = new JTextField();
+		tnombreclavep.setFont(new Font("Georgia", Font.BOLD, 16));
 		tnombreclavep.setColumns(10);
-		tnombreclavep.setBounds(429, 41, 86, 20);
+		tnombreclavep.setBounds(346, 216, 178, 32);
 		panelConsultas.add(tnombreclavep);
-		bbuscar.addActionListener(e->{
+
+		lconsultasid = new JLabel("Consultas por ID");
+		lconsultasid.setHorizontalAlignment(SwingConstants.CENTER);
+		lconsultasid.setFont(new Font("Georgia", Font.BOLD, 34));
+		lconsultasid.setBounds(249, 10, 579, 88);
+		panelConsultas.add(lconsultasid);
+		bbuscar.addActionListener(e -> {
 			consultarElementosConFiltro();
 		});
-	
+
 		bbuscar.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        try {
+			public void actionPerformed(ActionEvent e) {
+				try {
 
-		        	// Obtener el nombre de la tabla seleccionada desde el JList
-		            String selectedTable = cbnombretabla.getSelectedItem().toString();
-		            if (selectedTable == null || selectedTable.isEmpty()) {
-		                JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
-		                        JOptionPane.ERROR_MESSAGE);
-		                return;
-		            }
+					// Obtener el nombre de la tabla seleccionada desde el JList
+					String selectedTable = cbnombretabla.getSelectedItem().toString();
+					if (selectedTable == null || selectedTable.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-		            // Capturar las claves
-		            String partitionKeyName = tnombreclavep.getText().trim(); // Nombre de la clave de partición
-		            String partitionKeyValue = tvalorclav.getText().trim(); // Valor de la clave de partición
+					// Capturar las claves
+					String partitionKeyName = tnombreclavep.getText().trim(); // Nombre de la clave de partición
+					String partitionKeyValue = tvalorclav.getText().trim(); // Valor de la clave de partición
 
-		            // Validar campos obligatorios
-		            if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
-		                JOptionPane.showMessageDialog(null,
-		                        "La clave de partición y su valor son obligatorios para realizar una consulta.", "Error",
-		                        JOptionPane.ERROR_MESSAGE);
-		                return;
-		            }
+					// Validar campos obligatorios
+					if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
+						JOptionPane.showMessageDialog(null,
+								"La clave de partición y su valor son obligatorios para realizar una consulta.",
+								"Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-		            // Llamar al método para consultar los ítems
-		            dynamoApp.consulta.consultarItems(selectedTable, partitionKeyName, partitionKeyValue,textArea);
+					// Llamar al método para consultar los ítems
+					dynamoApp.consulta.consultarItems(selectedTable, partitionKeyName, partitionKeyValue, textArea);
 
-		        } catch (Exception ex) {
-		            JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		        }
-		    }
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		});
 	}
 
-	
-	
-	
-	
-	//FILTROS CON REGEX ERRORES PENDIENTES
+	// FILTROS CON REGEX 
 	private String generateFilterExpression(String filterKeyName, String filterKeyType, String regexPattern) {
-	    if (filterKeyType.equals("String")) {
-	        // Si es tipo String, usamos expresiones regulares
-	        if (regexPattern.startsWith("s/")) {
-	            // El formato es "s/regex/", ejemplo: "s/a.*b/" para cadenas que contengan "a" seguido de "b"
-	            String regex = regexPattern.substring(2); // Obtener el patrón de la expresión regular
-	            return "contains(" + filterKeyName + ", :filterValue)";  // Usamos "contains" para regex
-	        } else {
-	            // Si no es un regex, usamos contains por defecto
-	            return "contains(" + filterKeyName + ", :filterValue)";
-	        }
-	    } else if (filterKeyType.equals("Number")) {
-	        // Si es tipo Number, procesamos como comparación numérica
-	        if (regexPattern.contains(">")) {
-	            // Para comparaciones mayores que el valor
-	            String[] parts = regexPattern.split(">");
-	            if (parts.length == 2) {
-	                try {
-	                    int threshold = Integer.parseInt(parts[1].trim());
-	                    return filterKeyName + " > :filterValue";  // Compara si el valor del campo es mayor
-	                } catch (NumberFormatException e) {
-	                    JOptionPane.showMessageDialog(null, "Valor de comparación inválido para tipo Number", "Error", JOptionPane.ERROR_MESSAGE);
-	                    return "";
-	                }
-	            }
-	        } else if (regexPattern.contains("<")) {
-	            // Para comparaciones menores que el valor
-	            String[] parts = regexPattern.split("<");
-	            if (parts.length == 2) {
-	                try {
-	                    int threshold = Integer.parseInt(parts[1].trim());
-	                    return filterKeyName + " < :filterValue";  // Compara si el valor del campo es menor
-	                } catch (NumberFormatException e) {
-	                    JOptionPane.showMessageDialog(null, "Valor de comparación inválido para tipo Number", "Error", JOptionPane.ERROR_MESSAGE);
-	                    return "";
-	                }
-	            }
-	        } else if (regexPattern.contains("=")) {
-	            // Para comparaciones de igualdad
-	            String[] parts = regexPattern.split("=");
-	            if (parts.length == 2) {
-	                try {
-	                    int threshold = Integer.parseInt(parts[1].trim());
-	                    return filterKeyName + " = :filterValue";  // Compara si el valor del campo es igual
-	                } catch (NumberFormatException e) {
-	                    JOptionPane.showMessageDialog(null, "Valor de comparación inválido para tipo Number", "Error", JOptionPane.ERROR_MESSAGE);
-	                    return "";
-	                }
-	            }
-	        }
-	    }
+		if (filterKeyType.equals("String")) {
+			// Si es tipo String, usamos expresiones regulares
+			if (regexPattern.startsWith("s/")) {
+				// El formato es "s/regex/", ejemplo: "s/a.*b/" para cadenas que contengan "a"
+				// seguido de "b"
+				// String regex = regexPattern.substring(2); // Obtener el patrón de la
+				// expresión regular
+				return "contains(" + filterKeyName + ", :filterValue)"; // Usamos "contains" para regex
+			} else {
+				// Si no es un regex, usamos contains por defecto
+				return "contains(" + filterKeyName + ", :filterValue)";
+			}
+		} else if (filterKeyType.equals("Number")) {
+			// Si es tipo Number, procesamos como comparación numérica
+			if (regexPattern.contains(">")) {
+				// Para comparaciones mayores que el valor
+				String[] parts = regexPattern.split(">");
+				if (parts.length == 2) {
+					try {
+						// int threshold = Integer.parseInt(parts[1].trim());
+						return filterKeyName + " > :filterValue"; // Compara si el valor del campo es mayor
+					} catch (NumberFormatException e) {
+						JOptionPane.showMessageDialog(null, "Valor de comparación inválido para tipo Number", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return "";
+					}
+				}
+			} else if (regexPattern.contains("<")) {
+				// Para comparaciones menores que el valor
+				String[] parts = regexPattern.split("<");
+				if (parts.length == 2) {
+					try {
+						// int threshold = Integer.parseInt(parts[1].trim());
+						return filterKeyName + " < :filterValue"; // Compara si el valor del campo es menor
+					} catch (NumberFormatException e) {
+						JOptionPane.showMessageDialog(null, "Valor de comparación inválido para tipo Number", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return "";
+					}
+				}
+			} else if (regexPattern.contains("=")) {
+				// Para comparaciones de igualdad
+				String[] parts = regexPattern.split("=");
+				if (parts.length == 2) {
+					try {
+						// int threshold = Integer.parseInt(parts[1].trim());
+						return filterKeyName + " = :filterValue"; // Compara si el valor del campo es igual
+					} catch (NumberFormatException e) {
+						JOptionPane.showMessageDialog(null, "Valor de comparación inválido para tipo Number", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return "";
+					}
+				}
+			}
+		}
 
-	    return "";  // Si no se aplica ningún filtro, devolvemos vacío
+		return ""; // Si no se aplica ningún filtro, devolvemos vacío
 	}
 
 	private void consultarElementosConFiltro() {
-	    // Definir el nombre de la tabla
-	    String tableName = "test3";  // Asegúrate de que la tabla esté correctamente indicada
-	    String filterKeyName = "cadena";  // El campo en el que aplicar el filtro
-	    String regexPattern = "s/Dual.*";  // El patrón de filtrado (en este caso estamos buscando valores mayores a 6)
-	    String filterKeyType = "String";  // Tipo de filtro (en este caso estamos trabajando con números)
+		// Definir el nombre de la tabla
+		String tableName = "test3"; // Asegurarse de que la tabla esté correctamente indicada
+		String filterKeyName = "cadena"; // El campo en el que aplicar el filtro
+		String regexPattern = "s/Dual.*"; // El patrón de filtrado (en este caso estamos buscando valores mayores a 6)
+		String filterKeyType = "String"; // Tipo de filtro (en este caso estamos trabajando con números)
 
-	    // Variable que almacena el nombre de la clave de partición
-	    String nombreClaveParticion = "clave";  // Este es el nombre de la clave de partición (puede ser otro campo si es diferente)
+		// Variable que almacena el nombre de la clave de partición
+		String nombreClaveParticion = "clave"; // Este es el nombre de la clave de partición (puede ser otro campo si es
+												// diferente)
 
-	    AmazonDynamoDB client = dynamoApp.getDynamoDB();
-	    DynamoDB dynamoDB = new DynamoDB(client);
+		AmazonDynamoDB client = dynamoApp.getDynamoDB();
+		// DynamoDB dynamoDB = new DynamoDB(client);
 
-	    // Generar la expresión de filtro
-	    String filterExpression = generateFilterExpression(filterKeyName, filterKeyType, regexPattern);
+		// Generar la expresión de filtro
+		String filterExpression = generateFilterExpression(filterKeyName, filterKeyType, regexPattern);
 
-	    // Mapa para los valores de las expresiones
-	    Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-	    expressionAttributeValues.put(":clave", new AttributeValue().withS("uno"));  // Asigna un valor válido para :clave
+		// Mapa para los valores de las expresiones
+		Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
+		expressionAttributeValues.put(":clave", new AttributeValue().withS("uno")); // Asigna un valor válido para
+																					// :clave
 
-	    // Para números, aseguramos que el valor para :filterValue sea un número
-	    expressionAttributeValues.put(":filterValue", new AttributeValue().withN("6"));  // Aquí pasamos el número 6 como valor para la comparación
+		// Para números, aseguramos que el valor para :filterValue sea un número
+		expressionAttributeValues.put(":filterValue", new AttributeValue().withN("6")); // Aquí pasamos el número 6 como
+																						// valor para la comparación
 
-	    try {
-	        // Crear la solicitud de consulta
-	        QueryRequest queryRequest = new QueryRequest()
-	                .withTableName(tableName)
-	                .withKeyConditionExpression(nombreClaveParticion + " = :clave")  // Usamos la variable nombreClaveParticion aquí
-	                .withFilterExpression(filterExpression)  // Aplicamos la expresión con regex aquí
-	                .withExpressionAttributeValues(expressionAttributeValues);
+		try {
+			// Crear la solicitud de consulta
+			QueryRequest queryRequest = new QueryRequest().withTableName(tableName)
+					.withKeyConditionExpression(nombreClaveParticion + " = :clave") // Usamos la variable
+																					// nombreClaveParticion aquí
+					.withFilterExpression(filterExpression) // Aplicamos la expresión con regex aquí
+					.withExpressionAttributeValues(expressionAttributeValues);
 
-	        // Ejecutar la consulta
-	        QueryResult result = client.query(queryRequest);
+			// Ejecutar la consulta
+			QueryResult result = client.query(queryRequest);
 
-	        // Procesar los resultados
-	        if (result.getItems().isEmpty()) {
-	            textArea.append("No se encontraron resultados.\n");
-	        } else {
-	            for (Map<String, AttributeValue> item : result.getItems()) {
-	                StringBuilder sb = new StringBuilder();
-	                for (Map.Entry<String, AttributeValue> entry : item.entrySet()) {
-	                    if (entry.getValue().getS() != null) {
-	                        sb.append(entry.getKey()).append(": ").append(entry.getValue().getS()).append("\n");
-	                    } else if (entry.getValue().getN() != null) {
-	                        sb.append(entry.getKey()).append(": ").append(entry.getValue().getN()).append("\n");
-	                    }
-	                }
-	                textArea.append(sb.toString() + "\n");
-	            }
-	        }
-	    } catch (AmazonDynamoDBException e) {
-	        JOptionPane.showMessageDialog(null, "Error de consulta: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-	        System.out.println(e.getMessage());
-	    }
+			// Procesar los resultados
+			if (result.getItems().isEmpty()) {
+				textArea.append("No se encontraron resultados.\n");
+			} else {
+				for (Map<String, AttributeValue> item : result.getItems()) {
+					StringBuilder sb = new StringBuilder();
+					for (Map.Entry<String, AttributeValue> entry : item.entrySet()) {
+						if (entry.getValue().getS() != null) {
+							sb.append(entry.getKey()).append(": ").append(entry.getValue().getS()).append("\n");
+						} else if (entry.getValue().getN() != null) {
+							sb.append(entry.getKey()).append(": ").append(entry.getValue().getN()).append("\n");
+						}
+					}
+					textArea.append(sb.toString() + "\n");
+				}
+			}
+		} catch (AmazonDynamoDBException e) {
+			JOptionPane.showMessageDialog(null, "Error de consulta: " + e.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+			System.out.println(e.getMessage());
+		}
 	}
 
 	public void cargarTablasEnComboBox(JComboBox<String> comboBoxTablas) {
-	    comboBoxTablas.removeAllItems(); // Limpiar el JComboBox antes de agregar nuevos elementos
-	   dynamoApp.gestorTablas.listarTablas().forEach(comboBoxTablas::addItem); // Agregar los nombres de las tablas
+		comboBoxTablas.removeAllItems(); // Limpiar el JComboBox antes de agregar nuevos elementos
+		dynamoApp.gestorTablas.listarTablas().forEach(comboBoxTablas::addItem); // Agregar los nombres de las tablas
 	}
-
-
 }

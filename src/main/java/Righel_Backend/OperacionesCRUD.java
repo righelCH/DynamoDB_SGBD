@@ -26,7 +26,8 @@ public class OperacionesCRUD {
 
 	}
 
-	//-------------------------  CREATE/CREAR ITEM ------------------------------------------------------------------
+	// ------------------------- CREATE/CREAR ITEM
+	// ------------------------------------------------------------------
 	public void crearItem(String selectedTable, String partitionKeyName, String partitionKeyValue, String sortKeyName,
 			String sortKeyValue, String attributeName, String attributeType, String attributeValue) {
 		try {
@@ -113,7 +114,8 @@ public class OperacionesCRUD {
 
 	}
 
-	//------------------------- READ/LEER ITEM ------------------------------------------------------------------
+	// ------------------------- READ/LEER ITEM
+	// ------------------------------------------------------------------
 	public void leerItem(String selectedTable, String partitionKeyName, String partitionKeyValue, String sortKeyName,
 			String sortKeyValue, AmazonDynamoDB client) {
 		try {
@@ -152,7 +154,8 @@ public class OperacionesCRUD {
 		}
 	}
 
-	//------------------------- DELETE/BORRAR ITEM ------------------------------------------------------------------
+	// ------------------------- DELETE/BORRAR ITEM
+	// ------------------------------------------------------------------
 	public void borrarItem(String selectedTable, String partitionKeyName, String partitionKeyValue, String sortKeyName,
 			String sortKeyValue, AmazonDynamoDB client) {
 		try {
@@ -184,7 +187,8 @@ public class OperacionesCRUD {
 		}
 	}
 
-	//------------------------- UPDATE/MODIFICAR ITEM ------------------------------------------------------------------
+	// ------------------------- UPDATE/MODIFICAR ITEM
+	// ------------------------------------------------------------------
 	public void modificarItem(String selectedTable, String partitionKeyName, String partitionKeyValue,
 			String sortKeyName, String sortKeyValue, String attributeName, String attributeType, String attributeValue,
 			AmazonDynamoDB client) {
@@ -225,7 +229,6 @@ public class OperacionesCRUD {
 		}
 	}
 
-	
 // Método auxiliar para procesar el valor del atributo según su tipo
 	private static Object processAttributeValue(String attributeType, String attributeValue) {
 		switch (attributeType) {

@@ -2,108 +2,87 @@ package Righel_Backend;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
 
 import Laura_Fronted.GUI;
-import Laura_Fronted.Principal;
+import Laura_Fronted.LoginTab;
 
 import javax.swing.*;
 
 public class DynamoApp {
 
-	private AmazonDynamoDB userAltoNivel;
-	private String accessKeyId;
-	private String secretKey;
-	private String region;
-	private Principal frameGUI;
-private OperacionesCRUD operacion;
-private Gestion_de_Tablas gestorTabla;
+    private AmazonDynamoDB userBajoNivel;
+    private String accessKeyId;
+    private String secretKey;
+    private String region;
+    private LoginTab frameGUI;
 
-	public DynamoApp(String accessKeyId,String secretKey,String region,Principal frameGUI) {
-		this.accessKeyId=accessKeyId;
-		this.secretKey=secretKey;
-		this.region=region;
-		this.frameGUI=frameGUI;
-		connectToDynamoDB(accessKeyId, secretKey, region, frameGUI);
-	gestorTabla=new Gestion_de_Tablas(userAltoNivel);
-	
-	DynamoApp aa=new DynamoApp(accessKeyId, secretKey, region, frameGUI);
-	aa.gestorTabla.crearTabla(region, region, accessKeyId, secretKey, region, false, null, null);
-		//operacion=new OperacionesCRUD(dynamoDB, "")
-	}
+    // Clases auxiliares
+    public final Gestion_de_Tablas gestorTablas;
+    public final OperacionesCRUD operacion;
+    public final Consultas consulta;
 
-	private static DynamoApp instance;
+    // Singleton
+    private static DynamoApp instance;
 
-	public String getAccessKeyId() {
-		return accessKeyId;
-	}
+    public DynamoApp(String accessKeyId, String secretKey, String region, LoginTab frameGUI) {
+        this.accessKeyId = accessKeyId;
+        this.secretKey = secretKey;
+        this.region = region;
+        this.frameGUI = frameGUI;
 
-	public void setAccessKeyId(String accessKeyId) {
-		this.accessKeyId = accessKeyId;
-	}
+        // Conectar a DynamoDB
+        connectToDynamoDB();
 
-	public String getSecretKey() {
-		return secretKey;
-	}
+        // Inicializar las clases auxiliares con la conexión establecida
+        this.gestorTablas = new Gestion_de_Tablas(userBajoNivel);
+        this.operacion = new OperacionesCRUD(userBajoNivel);
+        this.consulta=new Consultas(userBajoNivel);
+    }
 
-	public void setSecretKey(String secretKey) {
-		this.secretKey = secretKey;
-	}
+    // Singleton: Inicializar solo una vez
+    public static void initInstance(String accessKeyId, String secretKey, String region, LoginTab frameGUI) {
+        if (instance == null) {
+            instance = new DynamoApp(accessKeyId, secretKey, region, frameGUI);
+        }
+    }
 
-	public String getRegion() {
-		return region;
-	}
+    // Obtener la instancia única
+    public static DynamoApp getInstance() {
+        return instance;
+    }
 
-	public void setRegion(String region) {
-		this.region = region;
-	}
+    // Conectar a DynamoDB
+    private void connectToDynamoDB() {
+        if (accessKeyId != null && secretKey != null && region != null) {
+            try {
+                BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKeyId, secretKey);
+                this.userBajoNivel = AmazonDynamoDBClientBuilder.standard()
+                        .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+                        .withRegion(Regions.fromName(region))
+                        .build();
 
-	// Método para obtener la instancia única
-	public static DynamoApp getInstance() {
-		if (instance == null) {
-	//		instance = new DynamoApp();
-		}
-		return instance;
-	}
+                ListTablesResult result = userBajoNivel.listTables();
+                JOptionPane.showMessageDialog(null, "Conexión exitosa.");
+                System.out.println("Conexión exitosa. Tablas disponibles: " + result.getTableNames());
 
-	@SuppressWarnings("deprecation")
-	public void connectToDynamoDB(String accessKeyId, String secretKey, String region, Principal principalFrame) {
-		if (accessKeyId != null && secretKey != null && region != null) {
-			try {
-				this.accessKeyId = accessKeyId;
-				this.secretKey = secretKey;
-				this.region = region;
+                // Abrir GUI y cerrar la ventana de inicio
+                GUI gui = new GUI(this);
+                gui.setVisible(true);
+                frameGUI.dispose();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Error al conectar con DynamoDB: " + e.getMessage());
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Faltan credenciales para conectar.");
+        }
+    }
 
-				// Configuración de credenciales
-				BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKeyId, secretKey);
-				this.dynamoDB = AmazonDynamoDBClientBuilder.standard()
-						.withCredentials(new AWSStaticCredentialsProvider(awsCreds))
-						.withRegion(Regions.fromName(region)).build();
-
-				// Operación para verificar conexión
-				ListTablesResult result = dynamoDB.listTables();
-				JOptionPane.showMessageDialog(null, "Conexión exitosa.");
-				System.out.println("Conexión exitosa. Tablas disponibles: " + result.getTableNames());
-
-				// Abre la nueva ventana (GUI)s
-				GUI gui = new GUI(this); // Pasa esta instancia
-				gui.setVisible(true);
-				principalFrame.dispose();
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, "Error al conectar con DynamoDB: " + e.getMessage());
-			}
-		} else {
-			JOptionPane.showMessageDialog(null, "Faltan credenciales para conectar.");
-		}
-	}
-
-	// Método para obtener el cliente DynamoDB
-	public AmazonDynamoDB getDynamoDB() {
-		return dynamoDB;
-	}
-
+    // Método para obtener la conexión (opcional)
+    public AmazonDynamoDB getDynamoDB() {
+        return userBajoNivel;
+    }
 }

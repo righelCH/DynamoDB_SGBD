@@ -1,180 +1,240 @@
 package Righel_Backend;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.swing.JOptionPane;
+
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
-import com.amazonaws.services.dynamodbv2.model.ReturnValue;
-import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
 
 public class OperacionesCRUD {
 
-	private final DynamoDB dynamoDB;
-	private String tableName;
+	private AmazonDynamoDB userAltoNivel;
+	
 
-	public OperacionesCRUD(DynamoDB dynamoDB, String tableName) {
-		this.dynamoDB = dynamoDB;
-		this.tableName = tableName;
+	public OperacionesCRUD(AmazonDynamoDB userAltoNivel) {
+		this.userAltoNivel = userAltoNivel;
+
 	}
 
-//	// Crear un ítem
-//	public void createItem(String key, String keyValue, String attribute, String attributeValue) {
-//		Table table = dynamoDB.getTable(tableName);
-//
-//		try {
-//			Item item = new Item().withPrimaryKey(key, keyValue).withString(attribute, attributeValue);
-//			table.putItem(item);
-//			System.out.println("Ítem creado exitosamente.");
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			System.out.println("Error al crear el ítem: " + e.getMessage());
-//		}
-//	}
-
-//	public void createItem(String key, String keyValue, String attribute, String attributeValue, String attributeType) {
-//	    Table table = dynamoDB.getTable(tableName); // Obtener la tabla seleccionada
-//
-//	    try {
-//	        // Crear un ítem y establecer la clave primaria
-//	        Item item = new Item().withPrimaryKey(key, keyValue);
-//
-//	        // Añadir el atributo dinámicamente según su tipo
-//	        switch (attributeType) {
-//	            case "String (S)":
-//	                item.withString(attribute, attributeValue);
-//	                break;
-//	            case "Number (N)":
-//	                item.withNumber(attribute, Double.parseDouble(attributeValue));
-//	                break;
-//	            case "Boolean (BOOL)":
-//	                item.withBoolean(attribute, Boolean.parseBoolean(attributeValue));
-//	                break;
-//	            case "Binary (B)":
-//	                item.withBinary(attribute, attributeValue.getBytes());
-//	                break;
-//	            case "Null (NULL)":
-//	                item.withNull(attribute);
-//	                break;
-//	            default:
-//	                throw new IllegalArgumentException("Tipo de atributo no soportado: " + attributeType);
-//	        }
-//
-//	        // Insertar el ítem en la tabla
-//	        table.putItem(item);
-//	        System.out.println("Ítem creado exitosamente.");
-//	    } catch (Exception e) {
-//	        e.printStackTrace();
-//	        System.out.println("Error al crear el ítem: " + e.getMessage());
-//	    }
-//	}
-
-	public void createItem(String partitionKey, String partitionKeyValue, String sortKey, String sortKeyValue,
-			String attribute1, String attribute1Value, String attribute2, String attribute2Value) {
-		Table table = dynamoDB.getTable(tableName);
-
+	public void crearItem(String selectedTable, String partitionKeyName, String partitionKeyValue, String sortKeyName,
+			String sortKeyValue, String attributeName, String attributeType, String attributeValue) {
 		try {
-// Crear un ítem
+			if (userAltoNivel == null) {
+				throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
+			}
+
+// Crear instancia de DynamoDB y seleccionar la tabla
+			DynamoDB dynamoDB = new DynamoDB(userAltoNivel);
+			Table table = dynamoDB.getTable(selectedTable);
+
+// Crear el ítem
 			Item item;
 
-// Verificar si se proporciona clave de ordenación
-			if (sortKey != null && !sortKey.isEmpty()) {
-				// Si hay clave de ordenación, usar ambos valores
-				item = new Item().withPrimaryKey(partitionKey, partitionKeyValue, sortKey, sortKeyValue);
+// Verificar si la clave de ordenación es necesaria
+			if (!sortKeyName.isEmpty() && !sortKeyValue.isEmpty()) {
+				item = new Item().withPrimaryKey(partitionKeyName, partitionKeyValue, sortKeyName, sortKeyValue);
 			} else {
-				// Si no hay clave de ordenación, solo usar la clave de partición
-				item = new Item().withPrimaryKey(partitionKey, partitionKeyValue);
+				item = new Item().withPrimaryKey(partitionKeyName, partitionKeyValue);
 			}
 
-// Añadir atributos adicionales
-			if (attribute1 != null && !attribute1.isEmpty() && attribute1Value != null) {
-				item.withString(attribute1, attribute1Value);
-			}
-			if (attribute2 != null && !attribute2.isEmpty() && attribute2Value != null) {
-				item.withString(attribute2, attribute2Value);
+// Procesar el tipo del atributo y agregarlo al ítem
+			switch (attributeType) {
+			case "String (S)":
+				item.withString(attributeName, attributeValue);
+				break;
+			case "Number (N)":
+				item.withNumber(attributeName, Double.parseDouble(attributeValue));
+				break;
+			case "Boolean (BOOL)":
+				item.withBoolean(attributeName, Boolean.parseBoolean(attributeValue));
+				break;
+			case "Binary (B)":
+				item.withBinary(attributeName, attributeValue.getBytes());
+				break;
+			case "Null (NULL)":
+				item.withNull(attributeName);
+				break;
+			case "List (L)":
+				List<String> list = Arrays.asList(attributeValue.split(","));
+				item.withList(attributeName, list);
+				break;
+			case "Map (M)":
+				Map<String, String> map = Arrays.stream(attributeValue.split(",")).map(s -> s.split("="))
+						.collect(Collectors.toMap(a -> a[0].trim(), a -> a[1].trim()));
+				item.withMap(attributeName, map);
+				break;
+			case "String Set (SS)":
+				Set<String> stringSet = new HashSet<>(Arrays.asList(attributeValue.split(",")));
+				item.withStringSet(attributeName, stringSet);
+				break;
+			case "Number Set (NS)":
+				Set<Number> numberSet = Arrays.stream(attributeValue.split(",")).map(Double::parseDouble)
+						.collect(Collectors.toSet());
+				item.withNumberSet(attributeName, numberSet);
+				break;
+			case "Binary Set (BS)":
+				Set<byte[]> binarySet = Arrays.stream(attributeValue.split(",")).map(String::getBytes)
+						.collect(Collectors.toSet());
+				item.withBinarySet(attributeName, binarySet);
+				break;
+			default:
+				throw new IllegalArgumentException("Tipo de atributo no soportado.");
 			}
 
 // Insertar el ítem en la tabla
 			table.putItem(item);
-			System.out.println("Ítem creado exitosamente.");
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Error al crear el ítem: " + e.getMessage());
+
+// Mensaje de éxito
+			JOptionPane.showMessageDialog(null, "Ítem creado exitosamente en la tabla: " + selectedTable, "Éxito",
+					JOptionPane.INFORMATION_MESSAGE);
+
+		} catch (NumberFormatException ex) {
+			JOptionPane.showMessageDialog(null,
+					"El valor ingresado no es válido para el tipo seleccionado (ejemplo: Number).", "Error",
+					JOptionPane.ERROR_MESSAGE);
+		} catch (IllegalArgumentException ex) {
+			JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, "Error al crear el ítem: " + ex.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+			ex.printStackTrace();
 		}
+
 	}
 
-	// Leer un ítem
-	public void readItem(String key, String keyValue) {
-		Table table = dynamoDB.getTable(tableName);
+	public void leerItem(String selectedTable, String partitionKeyName, String partitionKeyValue, 
+            String sortKeyName, String sortKeyValue, AmazonDynamoDB client) {
+try {
+// Validar que la clave de partición esté presente
+if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
+   throw new IllegalArgumentException("La clave de partición y su valor son obligatorios para leer un ítem.");
+}
 
+// Crear instancia de DynamoDB y seleccionar la tabla
+DynamoDB dynamoDB = new DynamoDB(client);
+Table table = dynamoDB.getTable(selectedTable);
+
+// Leer el ítem, verificando si hay una clave de ordenación
+Item item;
+if (!sortKeyName.isEmpty() && !sortKeyValue.isEmpty()) {
+   item = table.getItem(partitionKeyName, partitionKeyValue, sortKeyName, sortKeyValue);
+} else {
+   item = table.getItem(partitionKeyName, partitionKeyValue);
+}
+
+// Verificar si el ítem existe
+if (item != null) {
+   // Mostrar el ítem encontrado
+   JOptionPane.showMessageDialog(null, "Ítem encontrado:\n" + item.toJSONPretty(), 
+                                 "Ítem Encontrado", JOptionPane.INFORMATION_MESSAGE);
+} else {
+   JOptionPane.showMessageDialog(null, "No se encontró el ítem con la clave proporcionada.", 
+                                 "Ítem No Encontrado", JOptionPane.WARNING_MESSAGE);
+}
+
+} catch (Exception ex) {
+JOptionPane.showMessageDialog(null, "Error al leer el ítem: " + ex.getMessage(), "Error", 
+                             JOptionPane.ERROR_MESSAGE);
+ex.printStackTrace();
+}
+}
+
+
+	// Método para borrar un ítem de la tabla en DynamoDB
+	public void borrarItem(String selectedTable, String partitionKeyName, String partitionKeyValue, String sortKeyName,
+			String sortKeyValue, AmazonDynamoDB client) {
 		try {
-			Item item = table.getItem(key, keyValue);
-			if (item != null) {
-				System.out.println("Ítem encontrado: " + item.toJSONPretty());
-			} else {
-				System.out.println("Ítem no encontrado.");
+			// Validar que la clave de partición esté presente
+			if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
+				throw new IllegalArgumentException(
+						"La clave de partición y su valor son obligatorios para borrar un ítem.");
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Error al leer el ítem: " + e.getMessage());
+
+			// Crear instancia de DynamoDB y seleccionar la tabla
+			DynamoDB dynamoDB = new DynamoDB(client);
+			Table table = dynamoDB.getTable(selectedTable);
+
+			// Borrar el ítem
+			if (!sortKeyName.isEmpty() && !sortKeyValue.isEmpty()) {
+				table.deleteItem(partitionKeyName, partitionKeyValue, sortKeyName, sortKeyValue);
+			} else {
+				table.deleteItem(partitionKeyName, partitionKeyValue);
+			}
+
+			// Mensaje de éxito
+			JOptionPane.showMessageDialog(null, "Ítem borrado exitosamente de la tabla: " + selectedTable, "Éxito",
+					JOptionPane.INFORMATION_MESSAGE);
+
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, "Error al borrar el ítem: " + ex.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+			ex.printStackTrace();
 		}
 	}
 
-	public void updateItem(String primaryKey, String primaryKeyValue, String attributeName, String newValue) {
+	
+	public void modificarItem(String selectedTable, String partitionKeyName, String partitionKeyValue,
+			String sortKeyName, String sortKeyValue, String attributeName, String attributeType, String attributeValue,
+			AmazonDynamoDB client) {
 		try {
-			Table table = dynamoDB.getTable(tableName);
+// Validar que la clave de partición esté presente
+			if (partitionKeyName.isEmpty() || partitionKeyValue.isEmpty()) {
+				throw new IllegalArgumentException(
+						"La clave de partición y su valor son obligatorios para modificar un ítem.");
+			}
 
-// Crear la especificación de actualización
-			UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey(primaryKey, primaryKeyValue)
+// Validar que los atributos adicionales estén presentes
+			if (attributeName.isEmpty() || attributeValue.isEmpty() || attributeType.equals("Seleccione")) {
+				throw new IllegalArgumentException(
+						"Debe proporcionar el nombre, tipo y valor del atributo a modificar.");
+			}
+
+// Crear instancia de DynamoDB y seleccionar la tabla
+			DynamoDB dynamoDB = new DynamoDB(client);
+			Table table = dynamoDB.getTable(selectedTable);
+
+// Crear la especificación para la actualización
+			UpdateItemSpec updateItemSpec = new UpdateItemSpec()
+					.withPrimaryKey(partitionKeyName, partitionKeyValue, sortKeyName, sortKeyValue)
 					.withUpdateExpression("set #attr = :val").withNameMap(new NameMap().with("#attr", attributeName))
-					.withValueMap(new ValueMap().withString(":val", newValue))
-					.withReturnValues(ReturnValue.UPDATED_NEW);
+					.withValueMap(new ValueMap().with(":val", processAttributeValue(attributeType, attributeValue)));
 
 // Ejecutar la actualización
-			UpdateItemOutcome outcome = table.updateItem(updateItemSpec);
+			table.updateItem(updateItemSpec);
 
-			System.out.println("Ítem actualizado con éxito: " + outcome.getItem());
-		} catch (Exception e) {
-			System.err.println("Error al actualizar el ítem: " + e.getMessage());
+// Mensaje de éxito
+			JOptionPane.showMessageDialog(null, "Ítem modificado exitosamente en la tabla: " + selectedTable, "Éxito",
+					JOptionPane.INFORMATION_MESSAGE);
+
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, "Error al modificar el ítem: " + ex.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+			ex.printStackTrace();
 		}
 	}
 
-	// Eliminar un ítem
-	public void deleteItem(String key, String keyValue) {
-		Table table = dynamoDB.getTable(tableName);
-
-		try {
-			table.deleteItem(key, keyValue);
-			System.out.println("Ítem eliminado exitosamente.");
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Error al eliminar el ítem: " + e.getMessage());
+// Método auxiliar para procesar el valor del atributo según su tipo
+	private static Object processAttributeValue(String attributeType, String attributeValue) {
+		switch (attributeType) {
+		case "String":
+			return attributeValue;
+		case "Number":
+			return Double.valueOf(attributeValue);
+		case "Boolean":
+			return Boolean.valueOf(attributeValue);
+		default:
+			return attributeValue; // Por defecto, se asume como String
 		}
-	}
-
-	// Método para leer keyValue y attributeValue y devolverlos como lista
-	public List<String[]> getKeyAndAttributeValues(String keyName, String attributeName) {
-		List<String[]> results = new ArrayList<>();
-		try {
-			Table table = dynamoDB.getTable(tableName);
-
-			// Escanear toda la tabla
-			for (Item item : table.scan(new ScanSpec())) {
-				// Obtener valores específicos
-				String keyValue = item.getString(keyName); // Valor de la clave primaria
-				String attributeValue = item.getString(attributeName); // Valor del atributo
-
-				// Guardar en la lista como un arreglo de dos elementos
-				results.add(new String[] { keyValue, attributeValue });
-			}
-		} catch (Exception e) {
-			System.err.println("Error al obtener valores: " + e.getMessage());
-		}
-		return results; // Devolver la lista con los valores
 	}
 }

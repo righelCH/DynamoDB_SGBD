@@ -29,7 +29,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class Principal extends JFrame {
+public class LoginTab extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -57,7 +57,7 @@ public class Principal extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Principal frame = new Principal();
+					LoginTab frame = new LoginTab();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -69,7 +69,7 @@ public class Principal extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Principal() {
+	public LoginTab() {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
@@ -78,7 +78,7 @@ public class Principal extends JFrame {
 		});
 		System.setProperty("aws.java.v1.disableDeprecationAnnouncement", "true");
 		setTitle("DynamoDB");
-		setIconImage(Toolkit.getDefaultToolkit().getImage(Principal.class.getResource("/multimedia/Icono_dynamo.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(LoginTab.class.getResource("/multimedia/Icono_dynamo.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1200, 700);
 		contentPane = new JPanel();
@@ -97,7 +97,7 @@ public class Principal extends JFrame {
 
 		limagen = new JLabel((String) null);
 
-		Image dynamo = new ImageIcon(Principal.class.getResource("/multimedia/dynamo_sinbg.png")).getImage()
+		Image dynamo = new ImageIcon(LoginTab.class.getResource("/multimedia/dynamo_sinbg.png")).getImage()
 				.getScaledInstance(100, 80, Image.SCALE_SMOOTH);
 		limagen.setIcon(new ImageIcon(dynamo));
 		limagen.setBounds(688, 39, 112, 80);
@@ -180,7 +180,7 @@ public class Principal extends JFrame {
 					tfusuario.setBorder(null);
 					passwordField.setBorder(null);
 					comboRegion.setBorder(null);
-					DynamoApp user = new DynamoApp(" AKIA3C6FL6TAJVER4NWP", "Ao0igG5BTy4JjYBk7uwtipaInf1KsPBdkGs/2uu5", comboRegion.getSelectedItem().toString(), Principal.this);
+					 new DynamoApp(" AKIA3C6FL6TAJVER4NWP", "Ao0igG5BTy4JjYBk7uwtipaInf1KsPBdkGs/2uu5", comboRegion.getSelectedItem().toString(), LoginTab.this);
 					//user.connectToDynamoDB(tfusuario.getText(), String.valueOf(passwordField.getPassword()), comboRegion.getSelectedItem().toString(), Principal.this);
 
 	

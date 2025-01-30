@@ -2,18 +2,24 @@ package Righel_Backend;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class Gestion_de_Tablas {
 
-	private AmazonDynamoDB dynamoDB;
-	private DynamoDB dynamoDBClient;
+	private AmazonDynamoDB userBajoNivel;
+	private DynamoDB userMedioNivel;
 	public static GlobalSecondaryIndex getGsi() {
 		return gsi;
 	}
@@ -30,30 +36,66 @@ public class Gestion_de_Tablas {
 	    if (dynamoDB == null) {
 	        throw new IllegalArgumentException("El cliente AmazonDynamoDB no puede ser null");
 	    }
-	    this.dynamoDB = dynamoDB;
-	    this.dynamoDBClient = new DynamoDB(dynamoDB);
+	    this.userBajoNivel = dynamoDB;
+	    this.userMedioNivel = new DynamoDB(dynamoDB);
 	}
-//	// Método para listar las tablas
-//	public StringBuilder listarTablas() {
-//		StringBuilder tableList = null;
-//		try {
-//			ListTablesRequest listTablesRequest = new ListTablesRequest();
-//			ListTablesResult listTablesResponse = dynamoDB.listTables(listTablesRequest);
-//			List<String> tables = listTablesResponse.getTableNames();
-//
-//			tableList = new StringBuilder("Tablas disponibles:\n");
-//			for (String tableName : tables) {
-//				tableList.append(tableName).append("\n");
-//			}
-//			JOptionPane.showMessageDialog(null, tableList.toString());
-//		} catch (Exception e) {
-//			JOptionPane.showMessageDialog(null, "Error al listar las tablas: " + e.getMessage());
-//		}
-//
-//		return tableList;
-//	}
-
 	
+	// Método para cargar los datos de la tabla en un JTable
+    public  void cargarDatosTabla(String tableName, JTable tablaDatos) {
+        try {
+            // Validar que el cliente DynamoDB esté inicializado
+            if (userBajoNivel == null) {
+                throw new IllegalStateException("El cliente DynamoDB no está inicializado.");
+            }
+
+            // Crear una instancia de DynamoDB
+            DynamoDB dynamoDB = new DynamoDB(userBajoNivel);
+            Table table = dynamoDB.getTable(tableName);
+
+            // Escanear la tabla
+            ItemCollection<ScanOutcome> items = table.scan();
+
+            // Verificar si se obtuvieron datos
+            if (!items.iterator().hasNext()) {
+                System.out.println("No se encontraron datos en la tabla: " + tableName);
+                JOptionPane.showMessageDialog(null, "La tabla está vacía.", "Información",
+                        JOptionPane.INFORMATION_MESSAGE);
+                DefaultTableModel dtm = (DefaultTableModel) tablaDatos.getModel();
+                dtm.setRowCount(0); // Limpiar la tabla
+                return;
+            }
+
+            // Obtener los nombres de las columnas dinámicamente
+            Set<String> columnNamesSet = new HashSet<>();
+            for (Item item : items) {
+                columnNamesSet.addAll(item.asMap().keySet());
+            }
+
+            // Convertir a una lista para definir las columnas en el modelo
+            List<String> columnNames = new ArrayList<>(columnNamesSet);
+
+            // Crear un modelo para la tabla
+            DefaultTableModel tableModel = new DefaultTableModel(columnNames.toArray(), 0);
+
+            // Llenar el modelo con los datos
+            for (Item item : items) {
+                Object[] rowData = new Object[columnNames.size()];
+                for (int i = 0; i < columnNames.size(); i++) {
+                    String columnName = columnNames.get(i);
+                    rowData[i] = item.get(columnName); // Obtener el valor del atributo
+                }
+                tableModel.addRow(rowData);
+            }
+
+            // Asignar el modelo al JTable
+            tablaDatos.setModel(tableModel);
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al cargar datos de la tabla: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
 	public List<String> mostrarTablas(){
 		return  this.listarTablas();
 	}
@@ -62,17 +104,10 @@ public class Gestion_de_Tablas {
 	    try {
 	        // Solicitar las tablas
 	        ListTablesRequest listTablesRequest = new ListTablesRequest();
-	        ListTablesResult listTablesResponse = dynamoDB.listTables(listTablesRequest);
+	        ListTablesResult listTablesResponse = userBajoNivel.listTables(listTablesRequest);
 	        List<String> tables = listTablesResponse.getTableNames();
 
-//	        // Mostrar un mensaje al usuario
-//	        if (tables.isEmpty()) {
-//	            JOptionPane.showMessageDialog(null, "No hay tablas disponibles.");
-//	        } else {
-//	            JOptionPane.showMessageDialog(null, "Tablas actualizadas.");
-//	        }
-
-	        return tables; // Devuelve la lista directamente
+	        return tables; 
 	    } catch (Exception e) {
 	        JOptionPane.showMessageDialog(null, "Error al listar las tablas: " + e.getMessage());
 	        return new ArrayList<>(); // Devuelve una lista vacía en caso de error
@@ -132,7 +167,7 @@ public class Gestion_de_Tablas {
 	        }
 
 	        // Crear la tabla en DynamoDB
-	        Table table = dynamoDBClient.createTable(createTableRequest);
+	        Table table = userMedioNivel.createTable(createTableRequest);
 	        table.waitForActive(); // Esperar a que la tabla esté activa
 	        JOptionPane.showMessageDialog(null, "Tabla " + tableName + " creada con éxito.");
 
@@ -165,7 +200,7 @@ public class Gestion_de_Tablas {
 					.withGlobalSecondaryIndexUpdates(new GlobalSecondaryIndexUpdate().withCreate(createIndexAction));
 
 			// Realizar la actualización de la tabla
-			dynamoDB.updateTable(updateTableRequest);
+			userBajoNivel.updateTable(updateTableRequest);
 			JOptionPane.showMessageDialog(null, "Índice " + indexName + " añadido con éxito.");
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Error al definir el índice: " + e.getMessage());

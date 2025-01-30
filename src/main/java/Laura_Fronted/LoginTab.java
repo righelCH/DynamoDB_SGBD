@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Image;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.ImageIcon;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
@@ -56,6 +57,8 @@ public class LoginTab extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel");
+					
 					LoginTab frame = new LoginTab();
 					frame.setVisible(true);
 				} catch (Exception e) {

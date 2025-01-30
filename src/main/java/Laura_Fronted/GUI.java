@@ -51,7 +51,7 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingConstants;
-
+import javax.swing.UIManager;
 import javax.swing.JTable;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -146,11 +146,12 @@ public class GUI extends JFrame {
 				try {
 
 					// -
-					// UIManager.setLookAndFeel("com.jtattoo.plaf.bernstein.BernsteinLookAndFeel");
-
+					//
+					
+					
 					// ----
 					// UIManager.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
-					// --- UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel");
+		UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel");
 					
 					GUI frame = new GUI(dynamoApp);
 					frame.setVisible(true);

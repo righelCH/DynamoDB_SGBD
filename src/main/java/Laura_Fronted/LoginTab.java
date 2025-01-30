@@ -41,9 +41,8 @@ public class LoginTab extends JFrame {
 	private JLabel lregion;
 	private JComboBox<String> comboRegion;
 	private JButton btnEntrar;
-	private JLabel limagen;
-	public JLabel lresul;
-	
+	private JLabel limagen; JLabel lresul;
+	DynamoApp dynamoApp;
 	
 	
 	public JLabel getLresul() {
@@ -180,8 +179,11 @@ public class LoginTab extends JFrame {
 					tfusuario.setBorder(null);
 					passwordField.setBorder(null);
 					comboRegion.setBorder(null);
-					 new DynamoApp(" AKIA3C6FL6TAJVER4NWP", "Ao0igG5BTy4JjYBk7uwtipaInf1KsPBdkGs/2uu5", comboRegion.getSelectedItem().toString(), LoginTab.this);
-					//user.connectToDynamoDB(tfusuario.getText(), String.valueOf(passwordField.getPassword()), comboRegion.getSelectedItem().toString(), Principal.this);
+				 dynamoApp=	 new DynamoApp(" AKIA3C6FL6TAJVER4NWP", "Ao0igG5BTy4JjYBk7uwtipaInf1KsPBdkGs/2uu5", comboRegion.getSelectedItem().toString(), LoginTab.this);
+				 GUI gui = new GUI(dynamoApp);
+					gui.setVisible(true);
+				//	frame.dispose();	
+				 //user.connectToDynamoDB(tfusuario.getText(), String.valueOf(passwordField.getPassword()), comboRegion.getSelectedItem().toString(), Principal.this);
 
 	
 				}
@@ -199,6 +201,9 @@ public class LoginTab extends JFrame {
 		lresul.setBounds(185, 568, 825, 72);
 		contentPane.add(lresul);
 
+	}
+	public DynamoApp getDynamoApp() {
+		return dynamoApp;
 	}
 	// Método para copiar el texto al portapapeles  
     private static void copyToClipboard(String text) { 

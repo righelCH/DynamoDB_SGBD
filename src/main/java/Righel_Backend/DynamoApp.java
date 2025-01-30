@@ -69,9 +69,7 @@ public class DynamoApp {
 				System.out.println("Conexión exitosa. Tablas disponibles: " + result.getTableNames());
 
 				// Abrir GUI y cerrar la ventana de inicio
-				GUI gui = new GUI(this);
-				gui.setVisible(true);
-				frameGUI.dispose();
+				
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, "Error al conectar con DynamoDB: " + e.getMessage());
 			}

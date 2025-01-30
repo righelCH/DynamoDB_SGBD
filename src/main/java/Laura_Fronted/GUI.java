@@ -151,6 +151,7 @@ public class GUI extends JFrame {
 					// ----
 					// UIManager.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
 					// --- UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel");
+					
 					GUI frame = new GUI(dynamoApp);
 					frame.setVisible(true);
 				} catch (Exception e) {
@@ -167,8 +168,8 @@ public class GUI extends JFrame {
 	 * @param dynamoApp
 	 */
 	public GUI(DynamoApp dynamoApp) {
-		
-	this.dynamoApp=dynamoApp;
+		this.dynamoApp=dynamoApp;
+	
 		userBajoNivel= dynamoApp.getDynamoDB();
 		String[] columnas = {};
 		dtm = new DefaultTableModel(columnas, 0) {

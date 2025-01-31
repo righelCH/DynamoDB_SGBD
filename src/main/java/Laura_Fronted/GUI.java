@@ -116,6 +116,9 @@ public class GUI extends JFrame {
 	private JScrollPane scrollPane_2;
 	private JLabel lvalorclaveparticionconsulta;
 	private JLabel lconsultasid;
+	private static JTextArea textAreadatos;
+	private JScrollPane scrollPane_3;
+
 
 	/**
 	 * Launch the application.
@@ -224,7 +227,7 @@ public class GUI extends JFrame {
 		panelGestionTabla.add(scrollPane);
 
 		listaTablas = new JList<String>();
-		listaTablas.setBackground(Color.decode("#FEFFA7"));
+		listaTablas.setBackground(new Color(255, 255, 215));
 		scrollPane.setViewportView(listaTablas);
 		listaTablas.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 160)), "<html><b>Tablas</html>",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -468,7 +471,7 @@ public class GUI extends JFrame {
 		spinnerescritura.setBounds(473, 416, 53, 34);
 		panelGestionTabla.add(spinnerescritura);
 
-		btnActualizar = new JButton("Mostrar lista de tablas");
+		btnActualizar = new JButton("<html></Center>Mostrar lista de tablas/<br>actualizar lista de tablas</Center></html>");
 		btnActualizar.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/mostrar-contrasena.png")));
 
 		btnActualizar.setBorder(new LineBorder(new Color(255, 255, 255)));
@@ -505,7 +508,7 @@ public class GUI extends JFrame {
 			}
 
 		});
-		btnActualizar.setBounds(858, 359, 230, 43);
+		btnActualizar.setBounds(858, 341, 230, 61);
 		panelGestionTabla.add(btnActualizar);
 
 		panelCRUD = new JPanel();
@@ -879,16 +882,18 @@ public class GUI extends JFrame {
 		panelConsultas.add(lnombretablaconsulta);
 
 		scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBackground(new Color(255, 255, 255));
 		scrollPane_2.setForeground(new Color(0, 128, 64));
 		scrollPane_2.setFont(new Font("Tahoma", Font.BOLD, 14));
-		scrollPane_2.setBounds(677, 146, 459, 299);
+		scrollPane_2.setBounds(677, 146, 459, 183);
 		panelConsultas.add(scrollPane_2);
 
 		textArea = new JTextArea();
-		textArea.setBorder(new TitledBorder(
-				new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)),
-				"<html><b>Resultados de b\u00FAsqueda en formato JSON</html>", TitledBorder.CENTER, TitledBorder.TOP,
-				null, new Color(0, 0, 160)));
+		textArea.setForeground(new Color(0, 128, 0));
+		textArea.setFont(new Font("Tahoma", Font.BOLD, 13));
+		textArea.setBackground(new Color(255, 255, 255));
+		textArea.setEditable(false);
+		textArea.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "<html><b>Resultados de b\u00FAsqueda en formato JSON</html>", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 160)));
 		scrollPane_2.setViewportView(textArea);
 
 		lvalorclaveparticionconsulta = new JLabel("Valor de clave de partición");
@@ -902,9 +907,9 @@ public class GUI extends JFrame {
 		tvalorclav.setBounds(346, 277, 178, 32);
 		panelConsultas.add(tvalorclav);
 
-		lnombreclaveconsulta = new JLabel("Nombre clave");
+		lnombreclaveconsulta = new JLabel(" Nombre clave de partición");
 		lnombreclaveconsulta.setFont(new Font("Georgia", Font.BOLD, 18));
-		lnombreclaveconsulta.setBounds(69, 223, 151, 14);
+		lnombreclaveconsulta.setBounds(69, 223, 254, 25);
 		panelConsultas.add(lnombreclaveconsulta);
 
 		tnombreclavep = new JTextField();
@@ -913,11 +918,24 @@ public class GUI extends JFrame {
 		tnombreclavep.setBounds(346, 216, 178, 32);
 		panelConsultas.add(tnombreclavep);
 
-		lconsultasid = new JLabel("Consultas por ID");
+		lconsultasid = new JLabel("Consultas por Clave de partición");
 		lconsultasid.setHorizontalAlignment(SwingConstants.CENTER);
 		lconsultasid.setFont(new Font("Georgia", Font.BOLD, 34));
 		lconsultasid.setBounds(249, 10, 579, 88);
 		panelConsultas.add(lconsultasid);
+		
+		scrollPane_3 = new JScrollPane();
+		scrollPane_3.setBackground(new Color(255, 255, 255));
+		scrollPane_3.setBounds(677, 386, 459, 160);
+		panelConsultas.add(scrollPane_3);
+		
+		textAreadatos = new JTextArea();
+		textAreadatos.setForeground(new Color(0, 0, 0));
+		textAreadatos.setFont(new Font("Tahoma", Font.BOLD, 13));
+		textAreadatos.setBackground(new Color(255, 255, 255));
+		textAreadatos.setEditable(false);
+		textAreadatos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "<html><b>Resultados de b\u00FAsqueda</html>", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 160)));
+		scrollPane_3.setViewportView(textAreadatos);
 		bbuscar.addActionListener(e -> {
 			consultarElementosConFiltro();
 		});
@@ -947,8 +965,8 @@ public class GUI extends JFrame {
 					}
 
 					// Llamar al método para consultar los ítems
-					dynamoApp.consulta.consultarItems(selectedTable, partitionKeyName, partitionKeyValue, textArea);
-
+					//dynamoApp.consulta.consultarItems(selectedTable, partitionKeyName, partitionKeyValue, textArea);
+					dynamoApp.consulta.consultarItemsAmbosTextArea(selectedTable, partitionKeyName, partitionKeyValue, textArea, textAreadatos);
 				} catch (Exception ex) {
 					JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Error",
 							JOptionPane.ERROR_MESSAGE);
@@ -1072,9 +1090,9 @@ public class GUI extends JFrame {
 				}
 			}
 		} catch (AmazonDynamoDBException e) {
-			JOptionPane.showMessageDialog(null, "Error de consulta: " + e.getMessage(), "Error",
-					JOptionPane.ERROR_MESSAGE);
-			System.out.println(e.getMessage());
+//			JOptionPane.showMessageDialog(null, "Error de consulta: " + e.getMessage(), "Error",
+//					JOptionPane.ERROR_MESSAGE);
+//			System.out.println(e.getMessage());
 		}
 	}
 
@@ -1082,4 +1100,7 @@ public class GUI extends JFrame {
 		comboBoxTablas.removeAllItems(); // Limpiar el JComboBox antes de agregar nuevos elementos
 		dynamoApp.gestorTablas.listarTablas().forEach(comboBoxTablas::addItem); // Agregar los nombres de las tablas
 	}
+	
+
+
 }

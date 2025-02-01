@@ -58,8 +58,6 @@ public class Gestion_de_Tablas {
             // Verificar si se obtuvieron datos
             if (!items.iterator().hasNext()) {
                 System.out.println("No se encontraron datos en la tabla: " + tableName);
-                JOptionPane.showMessageDialog(null, "La tabla está vacía.", "Información",
-                        JOptionPane.INFORMATION_MESSAGE);
                 DefaultTableModel dtm = (DefaultTableModel) tablaDatos.getModel();
                 dtm.setRowCount(0); // Limpiar la tabla
                 return;

@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
@@ -119,7 +120,6 @@ public class GUI extends JFrame {
 	private static JTextArea textAreadatos;
 	private JScrollPane scrollPane_3;
 
-
 	/**
 	 * Launch the application.
 	 */
@@ -182,6 +182,7 @@ public class GUI extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1200, 700);
 		contentPane = new JPanel();
+		contentPane.setBackground(Color.decode("#FFE700"));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLocationRelativeTo(null);
 		setResizable(false);
@@ -189,6 +190,7 @@ public class GUI extends JFrame {
 		contentPane.setLayout(null);
 
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setFont(new Font("Tahoma", Font.BOLD, 14));
 		tabbedPane.setBackground(Color.decode("#FFE700"));
 		tabbedPane.setBounds(0, 0, 1190, 663);
 		contentPane.add(tabbedPane);
@@ -471,7 +473,8 @@ public class GUI extends JFrame {
 		spinnerescritura.setBounds(473, 416, 53, 34);
 		panelGestionTabla.add(spinnerescritura);
 
-		btnActualizar = new JButton("<html></Center>Mostrar lista de tablas/<br>actualizar lista de tablas</Center></html>");
+		btnActualizar = new JButton(
+				"<html></Center>Mostrar lista de tablas/<br>actualizar lista de tablas</Center></html>");
 		btnActualizar.setIcon(new ImageIcon(GUI.class.getResource("/multimedia/mostrar-contrasena.png")));
 
 		btnActualizar.setBorder(new LineBorder(new Color(255, 255, 255)));
@@ -565,7 +568,7 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					// Obtener el nombre de la tabla seleccionada desde el JList
-					String selectedTable = listaTablas.getSelectedValue(); 
+					String selectedTable = listaTablas.getSelectedValue();
 					if (selectedTable == null || selectedTable.isEmpty()) {
 						JOptionPane.showMessageDialog(null, "Seleccione una tabla de la lista.", "Error",
 								JOptionPane.ERROR_MESSAGE);
@@ -719,7 +722,7 @@ public class GUI extends JFrame {
 		tablaDatos.setForeground(Color.DARK_GRAY);
 		tablaDatos.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tablaDatos.setShowVerticalLines(true);
-		tablaDatos.setShowHorizontalLines(false);
+		tablaDatos.setShowHorizontalLines(true);
 		tablaDatos.setRowSelectionAllowed(true);
 		tablaDatos.setColumnSelectionAllowed(false);
 		tablaDatos.setSelectionForeground(Color.white);
@@ -727,6 +730,31 @@ public class GUI extends JFrame {
 		tablaDatos.setVisible(true);
 		tablaDatos.getTableHeader().setReorderingAllowed(false);
 		tablaDatos.setAutoCreateRowSorter(true);
+
+		tablaDatos.setSelectionForeground(Color.black);
+		tablaDatos.setSelectionBackground(Color.cyan);
+		tablaDatos.setGridColor(Color.red); // Establece el color de la cuadrícula
+		tablaDatos.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		tablaDatos.getTableHeader().setBackground(Color.MAGENTA); // Cambia el color de fondo del encabezado
+		tablaDatos.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14)); // Cambia fuente del encabezado
+		tablaDatos.getTableHeader().setForeground(new Color(255, 255, 255)); // Cambia color de la fuente del encabezado
+		tablaDatos.setVisible(true);
+
+		// Cambiar la alineación del texto del encabezado
+		DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) tablaDatos.getTableHeader()
+				.getDefaultRenderer();
+		headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		tablaDatos.getTableHeader().repaint();
+
+		// Cambiar la alineación del texto en las celdas
+		DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
+		cellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+		// Aplicar el renderizador a todas las columnas
+		for (int i = 0; i < tablaDatos.getColumnCount(); i++) {
+			tablaDatos.getColumnModel().getColumn(i).setCellRenderer(cellRenderer);
+		}
+
 		scrollPane_1.setViewportView(tablaDatos);
 
 		lresulcrud = new JLabel("");
@@ -893,7 +921,10 @@ public class GUI extends JFrame {
 		textArea.setFont(new Font("Tahoma", Font.BOLD, 13));
 		textArea.setBackground(new Color(255, 255, 255));
 		textArea.setEditable(false);
-		textArea.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "<html><b>Resultados de b\u00FAsqueda en formato JSON</html>", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 160)));
+		textArea.setBorder(new TitledBorder(
+				new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)),
+				"<html><b>Resultados de b\u00FAsqueda en formato JSON</html>", TitledBorder.CENTER, TitledBorder.TOP,
+				null, new Color(0, 0, 160)));
 		scrollPane_2.setViewportView(textArea);
 
 		lvalorclaveparticionconsulta = new JLabel("Valor de clave de partición");
@@ -923,18 +954,21 @@ public class GUI extends JFrame {
 		lconsultasid.setFont(new Font("Georgia", Font.BOLD, 34));
 		lconsultasid.setBounds(249, 10, 579, 88);
 		panelConsultas.add(lconsultasid);
-		
+
 		scrollPane_3 = new JScrollPane();
 		scrollPane_3.setBackground(new Color(255, 255, 255));
 		scrollPane_3.setBounds(677, 386, 459, 160);
 		panelConsultas.add(scrollPane_3);
-		
+
 		textAreadatos = new JTextArea();
 		textAreadatos.setForeground(new Color(0, 0, 0));
 		textAreadatos.setFont(new Font("Tahoma", Font.BOLD, 13));
 		textAreadatos.setBackground(new Color(255, 255, 255));
 		textAreadatos.setEditable(false);
-		textAreadatos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "<html><b>Resultados de b\u00FAsqueda</html>", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 160)));
+		textAreadatos.setBorder(new TitledBorder(
+				new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)),
+				"<html><b>Resultados de b\u00FAsqueda</html>", TitledBorder.CENTER, TitledBorder.TOP, null,
+				new Color(0, 0, 160)));
 		scrollPane_3.setViewportView(textAreadatos);
 		bbuscar.addActionListener(e -> {
 			consultarElementosConFiltro();
@@ -965,8 +999,10 @@ public class GUI extends JFrame {
 					}
 
 					// Llamar al método para consultar los ítems
-					//dynamoApp.consulta.consultarItems(selectedTable, partitionKeyName, partitionKeyValue, textArea);
-					dynamoApp.consulta.consultarItemsAmbosTextArea(selectedTable, partitionKeyName, partitionKeyValue, textArea, textAreadatos);
+					// dynamoApp.consulta.consultarItems(selectedTable, partitionKeyName,
+					// partitionKeyValue, textArea);
+					dynamoApp.consulta.consultarItemsAmbosTextArea(selectedTable, partitionKeyName, partitionKeyValue,
+							textArea, textAreadatos);
 				} catch (Exception ex) {
 					JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Error",
 							JOptionPane.ERROR_MESSAGE);
@@ -975,7 +1011,7 @@ public class GUI extends JFrame {
 		});
 	}
 
-	// FILTROS CON REGEX 
+	// FILTROS CON REGEX
 	private String generateFilterExpression(String filterKeyName, String filterKeyType, String regexPattern) {
 		if (filterKeyType.equals("String")) {
 			// Si es tipo String, usamos expresiones regulares
@@ -1100,7 +1136,5 @@ public class GUI extends JFrame {
 		comboBoxTablas.removeAllItems(); // Limpiar el JComboBox antes de agregar nuevos elementos
 		dynamoApp.gestorTablas.listarTablas().forEach(comboBoxTablas::addItem); // Agregar los nombres de las tablas
 	}
-	
-
 
 }
